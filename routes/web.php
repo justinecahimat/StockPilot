@@ -3,6 +3,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RegisterController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -22,3 +23,16 @@ Route::post('/logout', [AuthController::class, 'logout'])
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware('auth')->name('dashboard');
+
+
+
+
+//FOR REGISTRATION
+
+Route::get('/register', [RegisterController::class, 'showRegister'])
+    ->name('register');
+
+    Route::post('/register', [RegisterController::class, 'register'])
+    ->name('register.submit');
+
+    
