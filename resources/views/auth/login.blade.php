@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <title>Sign In | StockPilot</title>
 
     <style>
@@ -155,6 +156,38 @@
             background: #193b2a;
         }
 
+        
+        .create-account-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            margin-top: 12px;
+            padding: 13px;
+            border: 1px solid #234b38;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #234b38;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .create-account-btn:hover {
+            background: #234b38;
+            color: #ffffff;
+        }
+
+        .create-account-btn span {
+            transition: transform 0.2s;
+        }
+
+        .create-account-btn:hover span {
+            transform: translateX(4px);
+        }
+
         .error-message {
             padding: 12px;
             margin-bottom: 20px;
@@ -189,7 +222,7 @@
     <main class="login-container">
 
         <header class="brand">
-            <div class="brand-icon">S</div>
+            <div class="brand-icon"><i class="bi bi-box-seam"></i></div>
             <h1>StockPilot</h1>
             <p>Restaurant Inventory Management</p>
         </header>
@@ -260,6 +293,12 @@
                 <button type="submit" class="submit-btn">
                     Sign in
                 </button>
+                
+                <a href="{{ route('register') }}" class="create-account-btn">
+                    Create an account
+                    <span aria-hidden="true">&rarr;</span>
+                </a>
+
             </form>
         </section>
 

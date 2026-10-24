@@ -9,6 +9,7 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
           rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
         * {
@@ -212,6 +213,28 @@
                 font-size: 12px;
             }
         }
+        
+        /* Password field with Show/Hide button */
+        .password-box {
+            position: relative;
+        }
+
+        .password-box .form-control {
+            padding-right: 65px;
+        }
+
+        .show-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: none;
+            color: #315d43;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -219,7 +242,7 @@
 
     <!-- StockPilot Header -->
     <header class="brand">
-        <div class="brand-icon">S</div>
+        <div class="brand-icon"><i class="bi bi-box-seam"></i></div>
         <h1>StockPilot</h1>
         <p>Restaurant Inventory Management</p>
     </header>
@@ -313,6 +336,7 @@
                     </td>
                 </tr>
 
+                
                 <!-- Password -->
                 <tr>
                     <td>
@@ -321,16 +345,55 @@
                         </label>
                     </td>
                     <td>
-                        <input
-                            type="password"
-                            class="form-control"
-                            id="password"
-                            name="password"
-                            placeholder="Enter Password"
-                            minlength="8"
-                            autocomplete="new-password"
-                            required
-                        >
+                        <div class="password-box">
+                            <input
+                                type="password"
+                                class="form-control"
+                                id="password"
+                                name="password"
+                                placeholder="Enter Password"
+                                minlength="8"
+                                autocomplete="new-password"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="show-password"
+                                id="togglePassword"
+                            >Show</button>
+                        </div>
+                    </td>
+                </tr>
+
+
+
+                <!-- Confirm Password -->
+                <tr>
+                    <td>
+                        <label for="password_confirmation" class="form-label">
+                            Confirm Password
+                        </label>
+                    </td>
+                    <td>
+                        <div class="password-box">
+                            <input
+                                type="password"
+                                class="form-control"
+                                id="password_confirmation"
+                                name="password_confirmation"
+                                placeholder="Confirm Password"
+                                minlength="8"
+                                autocomplete="new-password"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="show-password"
+                                id="toggleConfirmPassword"
+                            >Show</button>
+                        </div>
                     </td>
                 </tr>
 
@@ -357,6 +420,29 @@
         </p>
 
     </div>
+ 
+    <script>
+        function setupPasswordToggle(inputId, buttonId) {
+            const password = document.getElementById(inputId);
+            const toggle = document.getElementById(buttonId);
 
+            toggle.addEventListener('click', function () {
+                if (password.type === 'password') {
+                    password.type = 'text';
+                    toggle.textContent = 'Hide';
+                } else {
+                    password.type = 'password';
+                    toggle.textContent = 'Show';
+                }
+            });
+        }
+
+        setupPasswordToggle('password', 'togglePassword');
+        setupPasswordToggle(
+            'password_confirmation',
+            'toggleConfirmPassword'
+        );
+    </script>
 </body>
 </html>
+
