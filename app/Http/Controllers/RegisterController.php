@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class RegisterController extends Controller
 {
@@ -11,33 +13,26 @@ class RegisterController extends Controller
         return view('auth.register');
     }
 
-    
     public function register(Request $request)
     {
-        // 1. Receive the submitted form data
-        $F_name = $request->input('F_name');
-        $L_name = $request->input('L_name');
-        $email = $request->input('email');
-        $password = $request->input('password');
-
-        // 2. Validate the data
+        // 1. Validate the submitted data
         $data = $request->validate([
             'F_name' => ['required', 'string', 'max:255'],
             'L_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        // 3. Insert the data into the users table
-        \App\Models\User::create([
-            'name' => $F_name . ' ' . $L_name,
-            'email' => $email,
-            'password' => \Illuminate\Support\Facades\Hash::make($password),
+        // 2. Create the account
+        User::create([
+            'name' => $data['F_name'] . ' ' . $data['L_name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'role' => 'Staff',
         ]);
 
-        // 4. Redirect after successful registration
-        return redirect('/login')
-            ->with('success', 'Registration successful!');
+        // 3. Redirect to login after registration
+        return redirect()->route('login')
+            ->with('success', 'Registration successful! You can now log in.');
     }
-
 }

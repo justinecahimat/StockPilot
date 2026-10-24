@@ -24,15 +24,9 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware('auth')->name('dashboard');
 
-
-
-
-//FOR REGISTRATION
-
+// Registration
 Route::get('/register', [RegisterController::class, 'showRegister'])
     ->name('register');
 
-    Route::post('/register', [RegisterController::class, 'register'])
+Route::post('/register', [RegisterController::class, 'register'])
     ->name('register.submit');
-
-    
