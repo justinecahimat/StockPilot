@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StockPilot - Record Stock-In</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-bg: #111e2e;
+            --sidebar-hover: #1c2d42;
+            --sidebar-active: #1f3d45;
+            --sidebar-active-border: #107c57;
+            --primary-green: #107c57;
+            --primary-green-hover: #0c6144;
+            --light-bg: #f4f6f8;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            min-height: 100vh;
+            color: #92a4b8;
+        }
+
+        .sidebar .brand-title {
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .sidebar .brand-subtitle {
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            color: #6c7d93;
+        }
+
+        .sidebar .section-label {
+            font-size: 0.7rem;
+            letter-spacing: 0.8px;
+            color: #58697d;
+            font-weight: 600;
+        }
+
+        .sidebar .nav-link {
+            color: #8c9ba8;
+            border-radius: 8px;
+            padding: 9px 14px;
+            font-size: 0.875rem;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: var(--sidebar-hover);
+            color: #ffffff;
+        }
+
+        .sidebar .nav-link.active {
+            background-color: var(--sidebar-active);
+            color: #ffffff;
+            font-weight: 500;
+            border-left: 3px solid var(--sidebar-active-border);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 24px 32px;
+        }
+
+        .top-nav {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .btn-green {
+            background-color: var(--primary-green);
+            color: white;
+            font-weight: 500;
+        }
+
+        .btn-green:hover {
+            background-color: var(--primary-green-hover);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="d-flex">
+    <!-- Sidebar -->
+    <aside class="sidebar p-3 d-flex flex-column">
+        <div class="mb-4 ps-2 pt-2">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-box-seam-fill text-success fs-4"></i>
+                <div>
+                    <div class="brand-title">StockPilot</div>
+                    <div class="brand-subtitle">RESTAURANT INVENTORY SYSTEM</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-label mb-2 ps-2">WORKSPACE</div>
+
+        <nav class="nav flex-column mb-auto">
+            <a href="{{ route('dashboard') }}" class="nav-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+            <a href="{{ route('ingredients.index') }}" class="nav-link"><i class="bi bi-box"></i> Ingredients & Supplies</a>
+            <a href="{{ route('categories.index') }}" class="nav-link"><i class="bi bi-tags"></i> Categories</a>
+            <a href="{{ route('suppliers.index') }}" class="nav-link"><i class="bi bi-truck"></i> Suppliers</a>
+            <a href="{{ route('stock-in.create') }}" class="nav-link active"><i class="bi bi-arrow-down-left-square"></i> Stock-In</a>
+            <a href="{{ route('stock-out.create') }}" class="nav-link"><i class="bi bi-arrow-up-right-square"></i> Stock-Out</a>
+            <a href="#" class="nav-link"><i class="bi bi-arrow-up-right-square"></i> Stock-Out</a>
+            <a href="#" class="nav-link"><i class="bi bi-exclamation-triangle"></i> Low-Stock Alerts</a>
+            <hr class="border-secondary my-2">
+            <a href="#" class="nav-link"><i class="bi bi-file-earmark-text"></i> Purchase Requests</a>
+            <a href="#" class="nav-link"><i class="bi bi-clock-history"></i> Inventory History</a>
+            <a href="#" class="nav-link"><i class="bi bi-bar-chart"></i> Reports</a>
+            <a href="#" class="nav-link"><i class="bi bi-people"></i> User Management</a>
+        </nav>
+
+        <!-- Logout Section -->
+        <div class="mt-3 pt-3 border-top border-secondary">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <a href="#" onclick="this.closest('form').submit(); return false;" class="nav-link text-danger">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Top Navbar -->
+        <header class="d-flex justify-content-between align-items-center mb-4">
+            <div class="top-nav">
+                Workspace / <span class="text-dark fw-medium">Record Stock-In</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="position-relative" style="width: 260px;">
+                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary"></i>
+                    <input type="text" class="form-control form-control-sm ps-5 bg-white border-0 shadow-sm" placeholder="Search anything...">
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 0.85rem;">
+                        AD
+                    </div>
+                    <div class="lh-1">
+                        <div class="fw-bold" style="font-size: 0.85rem;">Admin</div>
+                        <small class="text-secondary" style="font-size: 0.75rem;">Administrator</small>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Form Submission Form -->
+        <form action="{{ route('stock-in.store') }}" method="POST">
+            @csrf
+
+            <!-- Header & Action Buttons -->
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark mb-1">Record Stock-In</h2>
+                    <p class="text-secondary mb-0" style="font-size: 0.9rem;">Record incoming ingredients and update available quantities.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ route('ingredients.index') }}" class="btn btn-outline-secondary bg-white shadow-sm px-4 fw-medium" style="font-size: 0.875rem;">Cancel</a>
+                    <button type="submit" class="btn btn-green shadow-sm px-4" style="font-size: 0.875rem;">Save changes</button>
+                </div>
+            </div>
+
+            @if ($errors->any())
+                <div class="alert alert-danger py-2 mb-3" style="font-size: 0.85rem;">
+                    <ul class="mb-0 ps-3">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div class="row g-4">
+                <!-- Left Form Card -->
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm rounded-4 p-4">
+                        <h5 class="fw-bold text-dark mb-1">Stock-In details</h5>
+                        <p class="text-secondary mb-4" style="font-size: 0.85rem;">Complete the required fields below.</p>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium text-dark" style="font-size: 0.875rem;">Ingredient *</label>
+                                <select name="ingredient" class="form-select bg-light border-0 py-2" required>
+                                    <option value="" disabled selected>Select ingredient</option>
+                                    @foreach($ingredients as $ing)
+                                        <option value="{{ $ing->name }}" {{ old('ingredient') == $ing->name ? 'selected' : '' }}>{{ $ing->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium text-dark" style="font-size: 0.875rem;">Quantity received *</label>
+                                <input type="number" step="any" name="quantity" value="{{ old('quantity') }}" class="form-control bg-light border-0 py-2" placeholder="Enter quantity" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium text-dark" style="font-size: 0.875rem;">Supplier</label>
+                                <select name="supplier" class="form-select bg-light border-0 py-2">
+                                    <option value="" selected>Select supplier</option>
+                                    @foreach($suppliers as $sup)
+                                        <option value="{{ $sup->name }}" {{ old('supplier') == $sup->name ? 'selected' : '' }}>{{ $sup->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium text-dark" style="font-size: 0.875rem;">Unit cost (₱)</label>
+                                <input type="number" step="0.01" name="unit_cost" value="{{ old('unit_cost') }}" class="form-control bg-light border-0 py-2" placeholder="Enter unit cost">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium text-dark" style="font-size: 0.875rem;">Expiration date</label>
+                                <input type="date" name="expiration_date" value="{{ old('expiration_date') }}" class="form-control bg-light border-0 py-2">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium text-dark" style="font-size: 0.875rem;">Reference number</label>
+                                <input type="text" name="reference_number" value="{{ old('reference_number') }}" class="form-control bg-light border-0 py-2" placeholder="Enter reference number">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Helpful Tip Card -->
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4" style="background-color: #eaf3ed;">
+                        <div class="fw-bold text-dark mb-2" style="font-size: 0.95rem;"><i class="bi bi-lightbulb text-success me-1"></i> Helpful tip</div>
+                        <p class="text-secondary mb-0" style="font-size: 0.875rem; line-height: 1.5;">
+                            Record the quantity received so the available stock updates accurately.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </main>
+</div>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

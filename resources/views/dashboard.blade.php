@@ -75,7 +75,6 @@
             border-left: 3px solid var(--sidebar-active-border);
         }
 
-        /* Main Content */
         .main-content {
             flex: 1;
             padding: 24px 32px;
@@ -194,10 +193,12 @@
         <div class="section-label mb-2 ps-2">WORKSPACE</div>
 
         <nav class="nav flex-column mb-auto">
-            <a href="#" class="nav-link active"><i class="bi bi-grid-fill"></i> Dashboard</a>
-            <a href="#" class="nav-link"><i class="bi bi-box"></i> Ingredients & Supplies</a>
-            <a href="#" class="nav-link"><i class="bi bi-tags"></i> Categories</a>
-            <a href="#" class="nav-link"><i class="bi bi-truck"></i> Suppliers</a>
+            <a href="{{ route('dashboard') }}" class="nav-link active"><i class="bi bi-grid-fill"></i> Dashboard</a>
+            <a href="{{ route('ingredients.index') }}" class="nav-link"><i class="bi bi-box"></i> Ingredients & Supplies</a>
+            <a href="{{ route('categories.index') }}" class="nav-link"><i class="bi bi-tags"></i> Categories</a>
+            <a href="{{ route('suppliers.index') }}" class="nav-link"><i class="bi bi-truck"></i> Suppliers</a>
+            <a href="{{ route('stock-in.create') }}" class="nav-link"><i class="bi bi-arrow-down-left-square"></i> Stock-In</a>
+            <a href="{{ route('stock-out.create') }}" class="nav-link"><i class="bi bi-arrow-up-right-square"></i> Stock-Out</a>
             <a href="#" class="nav-link"><i class="bi bi-arrow-down-left-square"></i> Stock-In</a>
             <a href="#" class="nav-link"><i class="bi bi-arrow-up-right-square"></i> Stock-Out</a>
             <a href="#" class="nav-link"><i class="bi bi-exclamation-triangle"></i> Low-Stock Alerts</a>
@@ -208,7 +209,6 @@
             <a href="#" class="nav-link"><i class="bi bi-people"></i> User Management</a>
         </nav>
 
-        <!-- Logout Section -->
         <div class="mt-3 pt-3 border-top border-secondary">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
@@ -250,7 +250,7 @@
                 <p class="text-secondary mb-0" style="font-size: 0.9rem;">A clear overview of ingredient stock, alerts, and pending purchase requests.</p>
             </div>
             <div>
-                <button class="btn btn-green shadow-sm px-3">+ Add ingredient</button>
+                <button class="btn btn-green shadow-sm px-3" data-bs-toggle="modal" data-bs-target="#addIngredientModal">+ Add ingredient</button>
             </div>
         </div>
 
@@ -259,28 +259,28 @@
             <div class="col-md-3">
                 <div class="card-stat">
                     <div class="stat-title">TOTAL INGREDIENTS</div>
-                    <div class="stat-value">0</div>
+                    <div class="stat-value">{{ $totalIngredients }}</div>
                     <div class="stat-desc">Across all categories</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card-stat">
                     <div class="stat-title">LOW STOCK ITEMS</div>
-                    <div class="stat-value">0</div>
+                    <div class="stat-value">{{ $lowStockCount }}</div>
                     <div class="stat-desc">Need attention today</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card-stat">
                     <div class="stat-title">PENDING REQUESTS</div>
-                    <div class="stat-value">0</div>
+                    <div class="stat-value">{{ $pendingRequestsCount }}</div>
                     <div class="stat-desc">Awaiting manager review</div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card-stat">
                     <div class="stat-title">EXPIRING SOON</div>
-                    <div class="stat-value">0</div>
+                    <div class="stat-value">{{ $expiringSoonCount }}</div>
                     <div class="stat-desc">Within the next 7 days</div>
                 </div>
             </div>
@@ -288,7 +288,6 @@
 
         <!-- Middle Section (Chart + Watchlist) -->
         <div class="row g-3 mb-4">
-            <!-- Inventory Overview Chart -->
             <div class="col-md-8">
                 <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
                     <h5 class="fw-bold text-dark mb-0">Inventory overview</h5>
@@ -306,12 +305,22 @@
                 </div>
             </div>
 
-            <!-- Low-stock Watchlist -->
             <div class="col-md-4">
                 <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
                     <h5 class="fw-bold text-dark mb-0">Low-stock watchlist</h5>
                     <p class="text-secondary mb-3" style="font-size: 0.85rem;">Items below minimum quantity</p>
-                    <div class="text-secondary text-center py-4" style="font-size: 0.875rem;">No low-stock items found.</div>
+                    
+                    @forelse($lowStockItems as $item)
+                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                            <div>
+                                <span class="fw-medium text-dark">{{ $item->name }}</span>
+                                <br><small class="text-danger">Stock: {{ $item->quantity }}</small>
+                            </div>
+                            <span class="badge bg-danger-subtle text-danger">Low</span>
+                        </div>
+                    @empty
+                        <div class="text-secondary text-center py-4" style="font-size: 0.875rem;">No low-stock items found.</div>
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -336,9 +345,22 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td colspan="6" class="text-center text-secondary py-4">No recent activity recorded.</td>
-                        </tr>
+                        @forelse($recentActivities as $activity)
+                            <tr>
+                                <td>{{ $activity->ingredient->name ?? 'N/A' }}</td>
+                                <td>{{ $activity->transaction_type }}</td>
+                                <td>{{ $activity->quantity }}</td>
+                                <td>{{ $activity->user->name ?? 'Admin' }}</td>
+                                <td>{{ $activity->created_at->format('M d, Y h:i A') }}</td>
+                                <td>
+                                    <span class="badge bg-success-subtle text-success">Completed</span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center text-secondary py-4">No recent activity recorded.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -346,5 +368,7 @@
     </main>
 </div>
 
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
