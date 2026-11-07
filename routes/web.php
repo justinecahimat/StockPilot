@@ -9,6 +9,8 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\StockInController;
 use App\Http\Controllers\StockOutController;
+use App\Http\Controllers\LowStockAlertController;
+use App\Http\Controllers\purchaseRequestController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -33,4 +35,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/stock-in', [StockInController::class, 'store'])->name('stock-in.store');
     Route::get('/stock-out', [StockOutController::class, 'create'])->name('stock-out.create');
     Route::post('/stock-out', [StockOutController::class, 'store'])->name('stock-out.store');
+    Route::get('/low-stock-alert', [LowStockAlertController::class, 'index'])->name('low-stock-alert');
+    Route::get('/purchase-request', [purchaseRequestController::class, 'index'])->name('purchase-request');
 });
