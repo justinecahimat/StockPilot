@@ -9,73 +9,21 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        :root {
-            --sidebar-bg: #111e2e;
-            --sidebar-hover: #1c2d42;
-            --sidebar-active: #1f3d45;
-            --sidebar-active-border: #107c57;
-            --primary-green: #107c57;
-            --primary-green-hover: #0c6144;
-            --light-bg: #f4f6f8;
-        }
+        
 
         body {
             background-color: var(--light-bg);
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         }
 
-        /* Sidebar Styling */
-        .sidebar {
-            width: 260px;
-            background-color: var(--sidebar-bg);
-            min-height: 100vh;
-            color: #92a4b8;
-        }
-
-        .sidebar .brand-title {
-            color: #ffffff;
-            font-weight: 700;
-            font-size: 1.25rem;
-        }
-
-        .sidebar .brand-subtitle {
-            font-size: 0.65rem;
-            letter-spacing: 1px;
-            color: #6c7d93;
-        }
-
-        .sidebar .section-label {
-            font-size: 0.7rem;
-            letter-spacing: 0.8px;
-            color: #58697d;
-            font-weight: 600;
-        }
-
-        .sidebar .nav-link {
-            color: #8c9ba8;
-            border-radius: 8px;
-            padding: 9px 14px;
-            font-size: 0.875rem;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .sidebar .nav-link:hover {
-            background-color: var(--sidebar-hover);
-            color: #ffffff;
-        }
-
-        .sidebar .nav-link.active {
-            background-color: var(--sidebar-active);
-            color: #ffffff;
-            font-weight: 500;
-            border-left: 3px solid var(--sidebar-active-border);
-        }
-
         .main-content {
             flex: 1;
+            margin-left: 260px;
+
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+
             padding: 24px 32px;
         }
 
