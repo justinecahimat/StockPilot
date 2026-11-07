@@ -132,11 +132,13 @@
 
         <hr class="border-secondary my-2">
 
-        <a href="#" class="nav-link">
+        <a href="{{ route('low-stock-alert') }}" 
+            class="nav-link {{ request()->routeIs('low-stock-alert*') ? 'active' : '' }}">
             <i class="bi bi-exclamation-triangle"></i> Low-Stock Alerts
         </a>
 
-        <a href="#" class="nav-link">
+        <a href="{{ route('purchase-request') }}" 
+            class="nav-link {{ request()->routeIs('purchase-request*') ? 'active' : '' }}">
             <i class="bi bi-file-earmark-text"></i> Purchase Requests
         </a>
 
