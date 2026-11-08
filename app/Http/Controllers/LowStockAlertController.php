@@ -8,7 +8,7 @@ use Carbon\Carbon;
 
 class LowStockAlertController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         // Get today's date and the date 7 days from now
         $today = Carbon::today();
@@ -72,6 +72,15 @@ class LowStockAlertController extends Controller
 
             return $ingredient;
         });
+
+                // Search ingredients by name
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+
+            $alerts = $alerts->filter(function ($ingredient) use ($search) {
+                return stripos($ingredient->name, $search) !== false;
+            })->values();
+        }
 
         return view('low-stock-alerts', compact(
             'criticalIngredients',
