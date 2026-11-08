@@ -38,3 +38,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/low-stock-alert', [LowStockAlertController::class, 'index'])->name('low-stock-alert');
     Route::get('/purchase-request', [purchaseRequestController::class, 'index'])->name('purchase-request');
 });
+
+Route::get('/ingredients/{id}', [IngredientController::class, 'show'])->name('ingredients.show');

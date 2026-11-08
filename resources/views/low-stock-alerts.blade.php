@@ -258,6 +258,16 @@
                 display: none;
             }
         }
+
+        /* Ingredient Details Modal */
+        #ingredientDetailsModal .modal-content {
+            overflow: hidden;
+        }
+
+        .modal-backdrop.show {
+            opacity: 1;
+            background-color: rgba(15, 23, 42, 0.45);
+        }
     </style>
 </head>
 <body>
@@ -391,17 +401,28 @@
                                             <span class="status status-expired">Expired</span>
                                         @endif
                                     </td>
-                                    <td>
+                                    <td class="action-text">
                                         @if (in_array($ingredient->alert_status, ['Critical', 'Low Stock']))
-                                            <a href="{{ route('ingredients.show', $ingredient->id) }}"
-                                            class="action-text text-decoration-none">
-                                                Create request
-                                            </a>
+                                            Create request
                                         @else
-                                            <a href="{{ route('ingredients.show', $ingredient->id) }}"
-                                            class="action-text text-decoration-none">
+                                            <button
+                                                type="button"
+                                                class="btn btn-link action-text text-decoration-none p-0"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#ingredientDetailsModal"
+
+                                                data-name="{{ $ingredient->name }}"
+                                                data-category="{{ $ingredient->category }}"
+                                                data-quantity="{{ $ingredient->quantity }}"
+                                                data-unit="{{ $ingredient->unit }}"
+                                                data-minimum="{{ $ingredient->min_quantity }}"
+                                                data-supplier="{{ $ingredient->supplier }}"
+                                                data-expiration="{{ $ingredient->expiration_date ? \Carbon\Carbon::parse($ingredient->expiration_date)->format('M d, Y') : 'N/A' }}"
+                                                data-status="{{ $ingredient->alert_status }}"
+                                                data-notes="{{ $ingredient->notes }}"
+                                            >
                                                 Review item
-                                            </a>
+                                            </button>
                                         @endif
                                     </td>
                                 </tr>
@@ -419,10 +440,68 @@
 
         </div>
     </main>
-
 </div>
+
+        {{-- Ingredient Details Modal --}}
+        @include('ingredient-details-modal')
 
 <!-- Bootstrap 5 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script>
+            const ingredientModal = document.getElementById('ingredientDetailsModal');
+
+            ingredientModal.addEventListener('show.bs.modal', function (event) {
+
+                // Get the button that was clicked
+                const button = event.relatedTarget;
+
+                // Get ingredient information from the button
+                const name = button.getAttribute('data-name');
+                const category = button.getAttribute('data-category');
+                const quantity = button.getAttribute('data-quantity');
+                const unit = button.getAttribute('data-unit');
+                const minimum = button.getAttribute('data-minimum');
+                const supplier = button.getAttribute('data-supplier');
+                const expiration = button.getAttribute('data-expiration');
+                const status = button.getAttribute('data-status');
+                const notes = button.getAttribute('data-notes');
+
+                // Display ingredient information
+                document.getElementById('modalIngredientName').textContent = name;
+                document.getElementById('modalIngredientCategory').textContent = category || 'No category';
+
+                document.getElementById('modalIngredientQuantity').textContent =
+                    quantity + ' ' + unit;
+
+                document.getElementById('modalIngredientMinimum').textContent =
+                    minimum + ' ' + unit;
+
+                document.getElementById('modalIngredientSupplier').textContent =
+                    supplier || 'N/A';
+
+                document.getElementById('modalIngredientExpiration').textContent =
+                    expiration;
+
+                document.getElementById('modalIngredientNotes').textContent =
+                    notes || 'No additional notes.';
+
+                // Display status with the correct color
+                const statusElement = document.getElementById('modalIngredientStatus');
+
+                statusElement.textContent = status;
+                statusElement.className = 'status';
+
+                if (status === 'Critical') {
+                    statusElement.classList.add('status-critical');
+                } else if (status === 'Low Stock') {
+                    statusElement.classList.add('status-low');
+                } else if (status === 'Expiring Soon') {
+                    statusElement.classList.add('status-expiring');
+                } else if (status === 'Expired') {
+                    statusElement.classList.add('status-expired');
+                }
+            });
+        </script>
 </body>
 </html>

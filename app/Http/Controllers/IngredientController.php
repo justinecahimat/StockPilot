@@ -44,4 +44,13 @@ class IngredientController extends Controller
 
         return redirect()->back()->with('success', 'Ingredient added successfully!');
     }
+
+    public function show($id)
+    {
+        // Find the selected ingredient
+        $ingredient = Ingredient::findOrFail($id);
+
+        // Display the ingredient details page
+        return view('showIngredientsDetail', compact('ingredient'));
+    }
 }

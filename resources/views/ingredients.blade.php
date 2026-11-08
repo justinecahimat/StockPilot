@@ -155,7 +155,12 @@
                     <tbody>
                         @forelse($ingredients as $item)
                             <tr>
-                                <td class="fw-semibold text-dark">{{ $item->name }}</td>
+                                <td class="fw-semibold">
+                                    <a href="{{ route('ingredients.show', $item->id) }}"
+                                    class="text-dark text-decoration-none">
+                                        {{ $item->name }}
+                                    </a>
+                                </td>
                                 <td>{{ $item->category ?? 'N/A' }}</td>
                                 <td>{{ $item->quantity }} {{ $item->unit }}</td>
                                 <td>{{ $item->min_quantity }}</td>
