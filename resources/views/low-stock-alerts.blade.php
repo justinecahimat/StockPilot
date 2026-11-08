@@ -3,615 +3,505 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StockPilot - Dashboard</title>
+    <title>StockPilot - Low-Stock Alerts</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-                /* =========================================
-                LOW-STOCK ALERTS PAGE
-                ========================================= */
-
-                /* MAIN LAYOUT */
-                .low-stock-layout {
-                    display: flex;
-                    width: 100%;
-                    min-height: 100vh;
-                }
-
-                .main-content.low-stock-page {
-                    flex: 1;
-                    margin-left: 260px;
-                    height: 100vh;
-                    overflow-y: auto;
-                    overflow-x: hidden;
-                    padding: 0;
-                    background: #f4f7fa;
-                    color: #1e293b;
-                    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-                    box-sizing: border-box;
-                }
-
-                /* Prevent sizing inconsistencies */
-                .low-stock-page *,
-                .low-stock-page *::before,
-                .low-stock-page *::after {
-                    box-sizing: border-box;
-                }
-
-                /* =========================================
-                TOP NAVIGATION
-                ========================================= */
-
-                .low-stock-page .topbar {
-                    height: 72px;
-                    min-height: 72px;
-                    background: #ffffff;
-                    border-bottom: 1px solid #e2e8f0;
-
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-
-                    padding: 0 32px;
-                }
-
-                .low-stock-page .topbar-left .breadcrumb {
-                    font-size: 11px;
-                    color: #64748b;
-                    margin-bottom: 3px;
-                }
-
-                .low-stock-page .breadcrumb span {
-                    margin: 0 5px;
-                    color: #94a3b8;
-                }
-
-                .low-stock-page .topbar-left h2 {
-                    font-size: 17px;
-                    font-weight: 700;
-                    margin: 0;
-                    color: #1e293b;
-                }
-
-                .low-stock-page .topbar-right {
-                    display: flex;
-                    align-items: center;
-                    gap: 24px;
-                }
-
-                .low-stock-page .search-box {
-                    width: 220px;
-                    height: 36px;
-
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-
-                    padding: 0 12px;
-                    border: 1px solid #dbe3ed;
-                    border-radius: 7px;
-                    background: #f8fafc;
-                }
-
-                .low-stock-page .search-box i {
-                    font-size: 12px;
-                    color: #64748b;
-                }
-
-                .low-stock-page .search-box input {
-                    width: 100%;
-                    border: none;
-                    outline: none;
-                    background: transparent;
-                    font-size: 12px;
-                    color: #1e293b;
-                }
-
-                .low-stock-page .admin-profile {
-                    display: flex;
-                    align-items: center;
-                    gap: 9px;
-                }
-
-                .low-stock-page .admin-avatar {
-                    width: 30px;
-                    height: 30px;
-                    border-radius: 50%;
-                    background: #dff3e9;
-                    color: #16734f;
-
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-
-                    font-size: 10px;
-                    font-weight: 700;
-                }
-
-                .low-stock-page .admin-info {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 2px;
-                }
-
-                .low-stock-page .admin-info strong {
-                    font-size: 11px;
-                    color: #1e293b;
-                }
-
-                .low-stock-page .admin-info small {
-                    font-size: 9px;
-                    color: #64748b;
-                }
-
-                /* =========================================
-                PAGE CONTENT
-                ========================================= */
-
-                .low-stock-page .low-stock-content {
-                    padding: 26px 32px;
-                }
-
-                .low-stock-page .page-heading {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    gap: 15px;
-                    margin-bottom: 22px;
-                }
-
-                .low-stock-page .page-heading h1 {
-                    font-size: 24px;
-                    font-weight: 750;
-                    margin: 0 0 5px;
-                    color: #1e293b;
-                }
-
-                .low-stock-page .page-heading p {
-                    font-size: 12px;
-                    color: #64748b;
-                    margin: 0;
-                }
-
-                .low-stock-page .heading-actions {
-                    display: flex;
-                    gap: 9px;
-                }
-
-                .low-stock-page .heading-actions button {
-                    height: 37px;
-                    padding: 0 15px;
-                    border-radius: 6px;
-                    font-size: 11px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: background 0.2s ease;
-                }
-
-                .low-stock-page .btn-export {
-                    background: #ffffff;
-                    border: 1px solid #dbe3ed;
-                    color: #1e293b;
-                }
-
-                .low-stock-page .btn-export:hover {
-                    background: #f8fafc;
-                }
-
-                .low-stock-page .btn-create {
-                    background: #167653;
-                    border: 1px solid #167653;
-                    color: #ffffff;
-                }
-
-                .low-stock-page .btn-create:hover {
-                    background: #126044;
-                }
-
-                /* =========================================
-                SUMMARY CARDS
-                ========================================= */
-
-                .low-stock-page .alert-summary {
-                    display: grid;
-                    grid-template-columns: repeat(4, minmax(0, 1fr));
-                    gap: 14px;
-                    margin-bottom: 20px;
-                }
-
-                .low-stock-page .summary-card {
-                    background: #ffffff;
-                    border: 1px solid #e2e8f0;
-                    border-radius: 9px;
-                    padding: 17px;
-                    min-height: 112px;
-                    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
-                }
-
-                .low-stock-page .summary-label {
-                    display: block;
-                    font-size: 10px;
-                    font-weight: 700;
-                    color: #64748b;
-                    margin-bottom: 8px;
-                    letter-spacing: 0.3px;
-                }
-
-                .low-stock-page .summary-card h2 {
-                    font-size: 25px;
-                    font-weight: 700;
-                    margin: 0 0 5px;
-                    color: #1e293b;
-                }
-
-                .low-stock-page .summary-card p {
-                    font-size: 10px;
-                    color: #64748b;
-                    margin: 0;
-                }
-
-                /* =========================================
-                ITEMS REQUIRING ATTENTION
-                ========================================= */
-
-                .low-stock-page .attention-section {
-                    background: #ffffff;
-                    border: 1px solid #e2e8f0;
-                    border-radius: 9px;
-                    padding: 20px;
-                    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
-                }
-
-                .low-stock-page .attention-section h3 {
-                    font-size: 15px;
-                    font-weight: 700;
-                    margin: 0 0 17px;
-                    color: #1e293b;
-                }
-
-                .low-stock-page .table-container {
-                    width: 100%;
-                    overflow-x: auto;
-                }
-
-                .low-stock-page .alerts-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    text-align: left;
-                    white-space: nowrap;
-                }
-
-                .low-stock-page .alerts-table thead th {
-                    font-size: 10px;
-                    font-weight: 700;
-                    color: #64748b;
-                    padding: 13px 12px;
-                    border-bottom: 1px solid #e2e8f0;
-                    background: #f8fafc;
-                }
-
-                .low-stock-page .alerts-table tbody td {
-                    font-size: 11px;
-                    color: #475569;
-                    padding: 16px 12px;
-                    border-bottom: 1px solid #edf1f5;
-                }
-
-                .low-stock-page .alerts-table tbody tr:hover {
-                    background: #f8fafc;
-                }
-
-                .low-stock-page .alerts-table tbody tr:last-child td {
-                    border-bottom: none;
-                }
-
-                .low-stock-page .alerts-table .ingredient-name {
-                    font-weight: 700;
-                    color: #1e293b;
-                }
-
-                /* ALERT STATUS LABELS */
-
-                .low-stock-page .status {
-                    display: inline-block;
-                    padding: 5px 9px;
-                    border-radius: 20px;
-                    font-size: 10px;
-                    font-weight: 600;
-                }
-
-                .low-stock-page .status-critical {
-                    background: #fee2e2;
-                    color: #b91c1c;
-                }
-
-                .low-stock-page .status-low {
-                    background: #fef3c7;
-                    color: #92400e;
-                }
-
-                .low-stock-page .status-expiring {
-                    background: #ffedd5;
-                    color: #c2410c;
-                }
-
-                .low-stock-page .status-expired {
-                    background: #f1f5f9;
-                    color: #475569;
-                }
-
-                /* ACTION TEXT */
-
-                .low-stock-page .action-text {
-                    color: #167653;
-                    font-weight: 600;
-                    cursor: pointer;
-                }
-
-                .low-stock-page .action-text:hover {
-                    text-decoration: underline;
-                }
-
-                /* =========================================
-                RESPONSIVE DESIGN
-                ========================================= */
-
-                @media (max-width: 1100px) {
-                    .low-stock-page .alert-summary {
-                        grid-template-columns: repeat(2, minmax(0, 1fr));
-                    }
-
-                    .low-stock-page .low-stock-content {
-                        padding: 22px 24px;
-                    }
-                }
-
-                @media (max-width: 768px) {
-                    .main-content.low-stock-page {
-                        margin-left: 260px;
-                    }
-
-                    .low-stock-page .topbar {
-                        padding: 0 20px;
-                    }
-
-                    .low-stock-page .topbar-right {
-                        gap: 10px;
-                    }
-
-                    .low-stock-page .search-box {
-                        display: none;
-                    }
-
-                    .low-stock-page .page-heading {
-                        align-items: flex-start;
-                        flex-direction: column;
-                    }
-                }
-
-                @media (max-width: 600px) {
-                    .low-stock-page .low-stock-content {
-                        padding: 18px 14px;
-                    }
-
-                    .low-stock-page .heading-actions {
-                        width: 100%;
-                    }
-
-                    .low-stock-page .heading-actions button {
-                        flex: 1;
-                    }
-
-                    .low-stock-page .alert-summary {
-                        grid-template-columns: repeat(2, minmax(0, 1fr));
-                        gap: 9px;
-                    }
-
-                    .low-stock-page .summary-card {
-                        padding: 13px;
-                    }
-
-                    .low-stock-page .attention-section {
-                        padding: 15px 10px;
-                    }
-                }
-                </style>
-
-                <div class="low-stock-layout">
-
-                    @include('sidebar')
-
-                    <main class="main-content low-stock-page">
-
-                        <!-- TOP NAVIGATION -->
-                        <header class="topbar">
-
-                            <div class="topbar-left">
-                                <div class="breadcrumb">
-                                    Workspace <span>/</span> Low-Stock Alerts
-                                </div>
-
-                                <h2>Low-Stock Alerts</h2>
-                            </div>
-
-                            <div class="topbar-right">
-
-                                <div class="search-box">
-                                    <i class="bi bi-search"></i>
-                                    <input type="text" placeholder="Search anything...">
-                                </div>
-
-                                <div class="admin-profile">
-
-                                    <div class="admin-avatar">AD</div>
-
-                                    <div class="admin-info">
-                                        <strong>Admin</strong>
-                                        <small>Administrator</small>
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </header>
-
-                        <!-- PAGE CONTENT -->
-                        <div class="low-stock-content">
-
-                            <!-- PAGE TITLE AND BUTTONS -->
-                            <div class="page-heading">
-
-                                <div>
-                                    <h1>Low-Stock Alerts</h1>
-                                    <p>Prioritize low quantities and ingredients nearing expiration.</p>
-                                </div>
-
-                                <div class="heading-actions">
-
-                                    <button type="button" class="btn-export">
-                                        Export alerts
-                                    </button>
-
-                                    <button type="button" 
-                                            class="btn-create"
-                                            
-
-                                        <i class="fas fa-plus"></i>
-                                        Create request
-                                    </button>
-
-                                </div>
-
-                            </div>
-
-                            <!-- SUMMARY CARDS -->
-                            <section class="alert-summary">
-
-                                <div class="summary-card">
-                                    <span class="summary-label">CRITICAL</span>
-                                    <h2>{{ str_pad($criticalIngredients->count(), 2,'0', STR_PAD_LEFT) }}</h2>
-                                    <p>Below 25% of minimum</p>
-                                </div>
-
-                                <div class="summary-card">
-                                    <span class="summary-label">LOW STOCK</span>
-                                    <h2>{{ str_pad($lowStockIngredients->count(), 2, '0', STR_PAD_LEFT) }}</h2>
-                                    <p>Replenishment recommended</p>
-                                </div>
-
-                                <div class="summary-card">
-                                    <span class="summary-label">EXPIRING SOON</span>
-                                    <h2>{{ str_pad($expiringIngredients->count(), 2, '0', STR_PAD_LEFT) }}</h2>
-                                    <p>Next 7 days</p>
-                                </div>
-
-                                <div class="summary-card">
-                                    <span class="summary-label">EXPIRED</span>
-                                    <h2>{{ str_pad($expiredIngredients->count(), 2, '0', STR_PAD_LEFT) }}</h2>
-                                    <p>Review immediately</p>
-                                </div>
-
-                            </section>
-
-                            <!-- ITEMS REQUIRING ATTENTION -->
-                            <section class="attention-section">
-
-                                <h3>Items requiring attention</h3>
-
-                                <div class="table-container">
-
-                                    <table class="alerts-table">
-
-                                        <thead>
-                                            <tr>
-                                                <th>INGREDIENT</th>
-                                                <th>CURRENT STOCK</th>
-                                                <th>MINIMUM</th>
-                                                <th>EXPIRATION</th>
-                                                <th>ALERT</th>
-                                                <th>ACTION</th>
-                                            </tr>
-                                        </thead>
-
-                                        <tbody>
-
-                                            @forelse ($alerts as $ingredient)
-
-                                                <tr>
-                                                    <td class="ingredient-name">
-                                                        {{ $ingredient->name }}
-                                                    </td>
-
-                                                    <td>
-                                                        {{ $ingredient->quantity }} {{ $ingredient->unit }}
-                                                    </td>
-
-                                                    <td>
-                                                        {{ $ingredient->min_quantity }} {{ $ingredient->unit }}
-                                                    </td>
-
-                                                    <td>
-                                                        @if ($ingredient->expiration_date)
-                                                            {{ \Carbon\Carbon::parse($ingredient->expiration_date)->format('M d, Y') }}
-                                                        @else
-                                                            N/A
-                                                        @endif
-                                                    </td>
-
-                                                    <td>
-                                                        @if ($ingredient->alert_status === 'Critical')
-                                                            <span class="status status-critical">Critical</span>
-
-                                                        @elseif ($ingredient->alert_status === 'Low Stock')
-                                                            <span class="status status-low">Low Stock</span>
-
-                                                        @elseif ($ingredient->alert_status === 'Expiring Soon')
-                                                            <span class="status status-expiring">Expiring Soon</span>
-
-                                                        @elseif ($ingredient->alert_status === 'Expired')
-                                                            <span class="status status-expired">Expired</span>
-                                                        @endif
-                                                    </td>
-
-                                                    <td class="action-text">
-                                                        @if (in_array($ingredient->alert_status, ['Critical', 'Low Stock']))
-                                                            Create request
-                                                        @else
-                                                            Review item
-                                                        @endif
-                                                    </td>
-                                                </tr>
-
-                                            @empty
-
-                                                <tr>
-                                                    <td colspan="6" class="text-center py-4">
-                                                        No ingredients currently require attention.
-                                                    </td>
-                                                </tr>
-
-                                            @endforelse
-
-                                        </tbody>
-
-                                    </table>
-
-                                </div>
-
-                            </section>
-
-                        </div>
-
-                    </main>
-
+        :root {
+            --light-bg: #f8fafc;
+            --primary-green: #146c43;
+            --primary-green-hover: #0f5132;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            color: #1e293b;
+        }
+
+        .low-stock-layout {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .main-content.low-stock-page {
+            flex: 1;
+            margin-left: 260px;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0;
+            background-color: var(--light-bg);
+            box-sizing: border-box;
+        }
+
+        /* Prevent sizing inconsistencies */
+        .low-stock-page *,
+        .low-stock-page *::before,
+        .low-stock-page *::after {
+            box-sizing: border-box;
+        }
+
+        /* Top Navbar */
+        .top-navbar {
+            height: 72px;
+            min-height: 72px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .top-nav {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        /* Search Box */
+        .search-box {
+            width: 220px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 12px;
+            border: 1px solid #dbe3ed;
+            border-radius: 7px;
+            background: #f8fafc;
+        }
+
+        .search-box i {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .search-box input {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 12px;
+            color: #1e293b;
+        }
+
+        /* Page Content Padding */
+        .low-stock-content {
+            padding: 24px 32px;
+        }
+
+        /* Buttons */
+        .btn-green {
+            background-color: var(--primary-green);
+            color: white;
+            font-weight: 500;
+        }
+
+        .btn-green:hover {
+            background-color: var(--primary-green-hover);
+            color: white;
+        }
+
+        /* Summary Cards (Matching Card Detail Standards) */
+        .alert-summary {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+        }
+
+        .summary-label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .summary-card h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 0 4px;
+            color: #1e293b;
+        }
+
+        .summary-card p {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin: 0;
+        }
+
+        /* Items Requiring Attention Section */
+        .attention-section {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+        }
+
+        .attention-section h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0 0 20px;
+            color: #1e293b;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .alerts-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            white-space: nowrap;
+            font-size: 0.875rem;
+        }
+
+        .alerts-table thead th {
+            font-size: 0.725rem;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+        .alerts-table tbody td {
+            font-size: 0.875rem;
+            color: #334155;
+            padding: 16px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        .alerts-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .alerts-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .alerts-table .ingredient-name {
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        /* Alert Status Badges */
+        .status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-critical {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .status-low {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-expiring {
+            background: #ffedd5;
+            color: #c2410c;
+        }
+
+        .status-expired {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        /* Action Text */
+        .action-text {
+            color: var(--primary-green);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .action-text:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1100px) {
+            .alert-summary {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .search-box {
+                display: none;
+            }
+        }
+
+        /* Ingredient Details Modal */
+        #ingredientDetailsModal .modal-content {
+            overflow: hidden;
+        }
+
+        .modal-backdrop.show {
+            opacity: 1;
+            background-color: rgba(15, 23, 42, 0.45);
+        }
+    </style>
+</head>
+<body>
+
+<div class="low-stock-layout">
+
+    @include('sidebar')
+
+    <main class="main-content low-stock-page">
+
+        <!-- TOP NAVIGATION -->
+        <header class="top-navbar">
+            <div class="top-nav">
+                Workspace / <span class="text-dark fw-medium">Low-Stock Alerts</span>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+                <form action="{{ route('low-stock-alert') }}" method="GET" class="search-box">
+                    <i class="bi bi-search"></i>
+
+                    <input
+                        type="text"
+                        name="search"
+                        placeholder="Search ingredients..."
+                        value="{{ request('search') }}"
+                    >
+                </form>
+
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 0.85rem;">
+                        AD
+                    </div>
+                    <div class="lh-1">
+                        <div class="fw-bold" style="font-size: 0.85rem;">Admin</div>
+                        <small class="text-secondary" style="font-size: 0.75rem;">Administrator</small>
+                    </div>
                 </div>
-   
+            </div>
+        </header>
+
+        <!-- PAGE CONTENT CONTAINER -->
+        <div class="low-stock-content">
+
+            <!-- PAGE TITLE AND BUTTONS -->
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark mb-1">Low-Stock Alerts</h2>
+                    <p class="text-secondary mb-0" style="font-size: 0.9rem;">Prioritize low quantities and ingredients nearing expiration.</p>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary bg-white text-dark border-secondary-subtle px-3 fw-medium">
+                        Export alerts
+                    </button>
+                    <button type="button" class="btn btn-green px-3">
+                        <i class="bi bi-plus-lg me-1"></i> Create request
+                    </button>
+                </div>
+            </div>
+
+            <!-- SUMMARY CARDS -->
+            <section class="alert-summary">
+                <div class="summary-card">
+                    <span class="summary-label">CRITICAL</span>
+                    <h2>{{ str_pad($criticalIngredients->count() ?? 0, 2, '0', STR_PAD_LEFT) }}</h2>
+                    <p>Below 25% of minimum</p>
+                </div>
+
+                <div class="summary-card">
+                    <span class="summary-label">LOW STOCK</span>
+                    <h2>{{ str_pad($lowStockIngredients->count() ?? 0, 2, '0', STR_PAD_LEFT) }}</h2>
+                    <p>Replenishment recommended</p>
+                </div>
+
+                <div class="summary-card">
+                    <span class="summary-label">EXPIRING SOON</span>
+                    <h2>{{ str_pad($expiringIngredients->count() ?? 0, 2, '0', STR_PAD_LEFT) }}</h2>
+                    <p>Next 7 days</p>
+                </div>
+
+                <div class="summary-card">
+                    <span class="summary-label">EXPIRED</span>
+                    <h2>{{ str_pad($expiredIngredients->count() ?? 0, 2, '0', STR_PAD_LEFT) }}</h2>
+                    <p>Review immediately</p>
+                </div>
+            </section>
+
+            <!-- ITEMS REQUIRING ATTENTION -->
+            <section class="attention-section">
+                <h3>Items requiring attention</h3>
+
+                <div class="table-container">
+                    <table class="alerts-table">
+                        <thead>
+                            <tr>
+                                <th>INGREDIENT</th>
+                                <th>CURRENT STOCK</th>
+                                <th>MINIMUM</th>
+                                <th>EXPIRATION</th>
+                                <th>ALERT</th>
+                                <th>ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($alerts ?? [] as $ingredient)
+                                <tr>
+                                    <td class="ingredient-name">
+                                        {{ $ingredient->name }}
+                                    </td>
+                                    <td>
+                                        {{ $ingredient->quantity }} {{ $ingredient->unit }}
+                                    </td>
+                                    <td>
+                                        {{ $ingredient->min_quantity }} {{ $ingredient->unit }}
+                                    </td>
+                                    <td>
+                                        @if ($ingredient->expiration_date)
+                                            {{ \Carbon\Carbon::parse($ingredient->expiration_date)->format('M d, Y') }}
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($ingredient->alert_status === 'Critical')
+                                            <span class="status status-critical">Critical</span>
+                                        @elseif ($ingredient->alert_status === 'Low Stock')
+                                            <span class="status status-low">Low Stock</span>
+                                        @elseif ($ingredient->alert_status === 'Expiring Soon')
+                                            <span class="status status-expiring">Expiring Soon</span>
+                                        @elseif ($ingredient->alert_status === 'Expired')
+                                            <span class="status status-expired">Expired</span>
+                                        @endif
+                                    </td>
+                                    <td class="action-text">
+                                        @if (in_array($ingredient->alert_status, ['Critical', 'Low Stock']))
+                                            Create request
+                                        @else
+                                            <button
+                                                type="button"
+                                                class="btn btn-link action-text text-decoration-none p-0"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#ingredientDetailsModal"
+
+                                                data-name="{{ $ingredient->name }}"
+                                                data-category="{{ $ingredient->category }}"
+                                                data-quantity="{{ $ingredient->quantity }}"
+                                                data-unit="{{ $ingredient->unit }}"
+                                                data-minimum="{{ $ingredient->min_quantity }}"
+                                                data-supplier="{{ $ingredient->supplier }}"
+                                                data-expiration="{{ $ingredient->expiration_date ? \Carbon\Carbon::parse($ingredient->expiration_date)->format('M d, Y') : 'N/A' }}"
+                                                data-status="{{ $ingredient->alert_status }}"
+                                                data-notes="{{ $ingredient->notes }}"
+                                            >
+                                                Review item
+                                            </button>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-center text-secondary py-4">
+                                        No ingredients currently require attention.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+    </main>
+</div>
+
+        {{-- Ingredient Details Modal --}}
+        @include('ingredient-details-modal')
 
 <!-- Bootstrap 5 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script>
+            const ingredientModal = document.getElementById('ingredientDetailsModal');
+
+            ingredientModal.addEventListener('show.bs.modal', function (event) {
+
+                // Get the button that was clicked
+                const button = event.relatedTarget;
+
+                // Get ingredient information from the button
+                const name = button.getAttribute('data-name');
+                const category = button.getAttribute('data-category');
+                const quantity = button.getAttribute('data-quantity');
+                const unit = button.getAttribute('data-unit');
+                const minimum = button.getAttribute('data-minimum');
+                const supplier = button.getAttribute('data-supplier');
+                const expiration = button.getAttribute('data-expiration');
+                const status = button.getAttribute('data-status');
+                const notes = button.getAttribute('data-notes');
+
+                // Display ingredient information
+                document.getElementById('modalIngredientName').textContent = name;
+                document.getElementById('modalIngredientCategory').textContent = category || 'No category';
+
+                document.getElementById('modalIngredientQuantity').textContent =
+                    quantity + ' ' + unit;
+
+                document.getElementById('modalIngredientMinimum').textContent =
+                    minimum + ' ' + unit;
+
+                document.getElementById('modalIngredientSupplier').textContent =
+                    supplier || 'N/A';
+
+                document.getElementById('modalIngredientExpiration').textContent =
+                    expiration;
+
+                document.getElementById('modalIngredientNotes').textContent =
+                    notes || 'No additional notes.';
+
+                // Display status with the correct color
+                const statusElement = document.getElementById('modalIngredientStatus');
+
+                statusElement.textContent = status;
+                statusElement.className = 'status';
+
+                if (status === 'Critical') {
+                    statusElement.classList.add('status-critical');
+                } else if (status === 'Low Stock') {
+                    statusElement.classList.add('status-low');
+                } else if (status === 'Expiring Soon') {
+                    statusElement.classList.add('status-expiring');
+                } else if (status === 'Expired') {
+                    statusElement.classList.add('status-expired');
+                }
+            });
+        </script>
 </body>
 </html>
-
