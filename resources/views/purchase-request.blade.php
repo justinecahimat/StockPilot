@@ -186,86 +186,152 @@
                     </div>
                 </div>
 
+                
                 <!-- Top Details Overview Grid -->
                 <div class="row g-3 mb-4">
+
                     <!-- Left Info Card -->
                     <div class="col-md-8">
                         <div class="card-detail shadow-sm h-100">
-                            <div class="detail-meta-title mb-2">REQUEST #{{ $request->reference_no ?? 'PR-2026-008' }}</div>
-                            <h3 class="fw-bold text-dark mb-2">{{ $request->title ?? 'Weekly kitchen replenishment' }}</h3>
-                            
+
+                            <div class="detail-meta-title mb-2">
+                                REQUEST #{{ $request->reference_no }}
+                            </div>
+
+                            <h3 class="fw-bold text-dark mb-2">
+                                Purchase Request {{ $request->reference_no }}
+                            </h3>
+
                             <div class="mb-3">
-                                <span class="badge badge-pending">{{ ucfirst($request->status ?? 'Pending') }}</span>
+                                <span class="badge badge-pending">
+                                    {{ ucfirst($request->status) }}
+                                </span>
                             </div>
 
                             <div class="text-secondary mb-3" style="font-size: 0.85rem;">
-                                Created by <span class="fw-medium text-dark">{{ $request->creator->name ?? 'María Santos' }}</span> &bull; {{ isset($request) ? $request->created_at->format('M d, Y') : 'Oct 12, 2026' }}
+                                Created by
+                                <span class="fw-medium text-dark">
+                                    {{ $request->requester->name ?? 'Unknown' }}
+                                </span>
+                                &bull;
+                                {{ $request->created_at->format('M d, Y') }}
                             </div>
 
                             <p class="text-secondary mb-0" style="font-size: 0.9rem;">
-                                {{ $request->description ?? "Please replenish items listed for next week's menu." }}
+                                Review the requested ingredients and their estimated costs.
                             </p>
+
                         </div>
                     </div>
 
                     <!-- Right Summary Card -->
                     <div class="col-md-4">
                         <div class="card-detail shadow-sm h-100">
-                            <div class="detail-meta-title mb-2">ESTIMATED TOTAL</div>
+
+                            @php
+                                $total = $request->items->sum(function ($item) {
+                                    return $item->requested_quantity * $item->unit_cost;
+                                });
+                            @endphp
+
+                            <div class="detail-meta-title mb-2">
+                                ESTIMATED TOTAL
+                            </div>
+
                             <div class="fw-bold text-dark mb-3" style="font-size: 2rem;">
-                                &#8369; {{ number_format($request->total_amount ?? 8450.00, 2) }}
+                                &#8369; {{ number_format($total, 2) }}
                             </div>
 
                             <div class="text-secondary mb-2" style="font-size: 0.9rem;">
-                                <span class="fw-medium text-dark">{{ $request->items_count ?? count($requestItems ?? [1,2,3,4]) }}</span> ingredients
+                                <span class="fw-medium text-dark">
+                                    {{ $request->items->count() }}
+                                </span>
+                                ingredients
                             </div>
-                            <div class="fw-bold text-dark" style="font-size: 0.9rem;">
-                                Within {{ $request->lead_time ?? '3–5 days' }}
-                            </div>
+
                         </div>
                     </div>
+
                 </div>
 
+
+                
                 <!-- Requested Items Table Section -->
                 <div class="card border-0 shadow-sm rounded-4 p-4">
+
                     <h5 class="fw-bold text-dark mb-4">Requested items</h5>
 
                     <div class="table-responsive">
                         <table class="table table-items align-middle mb-0">
+
                             <thead>
                                 <tr>
-                                    <th scope="col">INGREDIENT</th>
-                                    <th scope="col">QUANTITY</th>
-                                    <th scope="col">UNIT COST</th>
-                                    <th scope="col">SUBTOTAL</th>
-                                    <th scope="col">STOCK NOW</th>
-                                    <th scope="col">REVIEW</th>
+                                    <th>INGREDIENT</th>
+                                    <th>QUANTITY</th>
+                                    <th>UNIT COST</th>
+                                    <th>SUBTOTAL</th>
+                                    <th>STOCK NOW</th>
+                                    <th>REVIEW</th>
                                 </tr>
                             </thead>
+
                             <tbody>
-                                @forelse($requestItems ?? [
-                                    ['name' => 'Chicken breast', 'qty' => '10 kg', 'unit_cost' => 240.00, 'subtotal' => 2400.00, 'stock' => '2 kg', 'status' => 'Needs review'],
-                                    ['name' => 'Cooking oil', 'qty' => '12 bottles', 'unit_cost' => 180.00, 'subtotal' => 2160.00, 'stock' => '3 bottles', 'status' => 'Needs review'],
-                                    ['name' => 'Mozzarella cheese', 'qty' => '8 kg', 'unit_cost' => 310.00, 'subtotal' => 2480.00, 'stock' => '1.5 kg', 'status' => 'Needs review'],
-                                    ['name' => 'Tomato sauce', 'qty' => '10 cans', 'unit_cost' => 85.00, 'subtotal' => 850.00, 'stock' => '4 cans', 'status' => 'Needs review']
-                                ] as $item)
+
+                                @forelse($request->items as $item)
+
                                     <tr>
-                                        <td class="fw-bold text-dark">{{ $item['name'] ?? $item->ingredient->name }}</td>
-                                        <td>{{ $item['qty'] ?? ($item->quantity . ' ' . $item->unit) }}</td>
-                                        <td>&#8369; {{ number_format($item['unit_cost'] ?? $item->unit_cost, 2) }}</td>
-                                        <td>&#8369; {{ number_format($item['subtotal'] ?? $item->subtotal, 2) }}</td>
-                                        <td>{{ $item['stock'] ?? ($item->ingredient->current_stock . ' ' . $item->unit) }}</td>
-                                        <td class="text-secondary">{{ $item['status'] ?? ($item->review_status ?? 'Needs review') }}</td>
+
+                                        <!-- INGREDIENT -->
+                                        <td class="fw-bold text-dark">
+                                            {{ $item->ingredient->name ?? 'Unknown Ingredient' }}
+                                        </td>
+
+                                        <!-- QUANTITY -->
+                                        <td>
+                                            {{ number_format($item->requested_quantity, 2) }}
+                                            {{ $item->unit }}
+                                        </td>
+
+                                        <!-- UNIT COST -->
+                                        <td>
+                                            ₱ {{ number_format($item->unit_cost, 2) }}
+                                        </td>
+
+                                        <!-- SUBTOTAL -->
+                                        <td>
+                                            ₱ {{ number_format($item->requested_quantity * $item->unit_cost, 2) }}
+                                        </td>
+
+                                        <!-- CURRENT STOCK -->
+                                        <td>
+                                            {{ $item->current_stock }}
+                                            {{ $item->unit }}
+                                        </td>
+
+                                        <!-- REVIEW -->
+                                        <td class="text-secondary">
+                                            Needs review
+                                        </td>
+
                                     </tr>
+
                                 @empty
+
                                     <tr>
-                                        <td colspan="6" class="text-center text-secondary py-4">No requested items found for this purchase request.</td>
+                                        <td colspan="6" class="text-center text-secondary py-4">
+                                            No requested items found for this purchase request.
+                                        </td>
                                     </tr>
+
                                 @endforelse
+
                             </tbody>
+
                         </table>
                     </div>
+
                 </div>
+
             </div>
     </main>
 </div>

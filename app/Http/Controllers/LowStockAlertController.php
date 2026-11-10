@@ -82,12 +82,16 @@ class LowStockAlertController extends Controller
             })->values();
         }
 
+        // Get all ingredients for the reusable Purchase Request modal
+        $ingredients = Ingredient::orderBy('name')->get();
+
         return view('low-stock-alerts', compact(
             'criticalIngredients',
             'lowStockIngredients',
             'expiringIngredients',
             'expiredIngredients',
-            'alerts'
+            'alerts',
+            'ingredients'
         ));
     }
 }

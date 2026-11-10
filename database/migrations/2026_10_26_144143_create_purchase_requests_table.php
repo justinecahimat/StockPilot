@@ -1,3 +1,4 @@
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -6,21 +7,24 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-   public function up(): void
-{
-    Schema::create('purchase_requests', function (Blueprint $table) {
-        $table->id();
-        $table->string('status')->default('pending');
-        $table->timestamps();
-    });
-}
+    public function up(): void
+    {
+        Schema::create('purchase_requests', function (Blueprint $table) {
+            $table->id();
 
-    /**
-     * Reverse the migrations.
-     */
+            // Purchase request information
+            $table->string('reference_no', 50)->unique();
+            $table->foreignId('requested_by')
+                  ->constrained('users')
+                  ->restrictOnDelete();
+
+            // Request status
+            $table->string('status')->default('pending');
+
+            $table->timestamps();
+        });
+    }
+
     public function down(): void
     {
         Schema::dropIfExists('purchase_requests');

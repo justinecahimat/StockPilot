@@ -322,7 +322,10 @@
                     <button type="button" class="btn btn-outline-secondary bg-white text-dark border-secondary-subtle px-3 fw-medium">
                         Export alerts
                     </button>
-                    <button type="button" class="btn btn-green px-3">
+                    <button type="button"
+                            class="btn btn-green px-3"
+                            data-bs-toggle="modal"
+                            data-bs-target="#createPurchaseRequestModal">
                         <i class="bi bi-plus-lg me-1"></i> Create request
                     </button>
                 </div>
@@ -403,7 +406,13 @@
                                     </td>
                                     <td class="action-text">
                                         @if (in_array($ingredient->alert_status, ['Critical', 'Low Stock']))
-                                            Create request
+                                            <button type="button"
+                                                    class="btn btn-link action-text text-decoration-none p-0"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#createPurchaseRequestModal"
+                                                    data-ingredient-id="{{ $ingredient->id }}">
+                                                Create request
+                                            </button>
                                         @else
                                             <button
                                                 type="button"
@@ -501,6 +510,47 @@
                 } else if (status === 'Expired') {
                     statusElement.classList.add('status-expired');
                 }
+            });
+        </script>
+
+        @include('purchase-requests.create-modal')
+
+        <script>
+            const purchaseRequestModal = document.getElementById('createPurchaseRequestModal');
+
+            purchaseRequestModal.addEventListener('show.bs.modal', function (event) {
+
+                const button = event.relatedTarget;
+
+                if (!button || !button.hasAttribute('data-ingredient-id')) {
+                    return;
+                }
+
+                const ingredientId = button.getAttribute('data-ingredient-id');
+
+                const ingredientSelect = purchaseRequestModal.querySelector(
+                    'select[name="items[0][ingredient_id]"]'
+                );
+
+                if (ingredientSelect) {
+
+                    ingredientSelect.value = ingredientId;
+
+                    const selectedOption = ingredientSelect.options[
+                        ingredientSelect.selectedIndex
+                    ];
+
+                    const stockDisplay = ingredientSelect
+                        .closest('.purchase-item-row')
+                        .querySelector('.current-stock');
+
+                    const stock = selectedOption.dataset.stock;
+                    const unit = selectedOption.dataset.unit || '';
+
+                    stockDisplay.textContent =
+                        'Current stock: ' + stock + ' ' + unit;
+                }
+
             });
         </script>
 </body>

@@ -10,7 +10,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\StockInController;
 use App\Http\Controllers\StockOutController;
 use App\Http\Controllers\LowStockAlertController;
-use App\Http\Controllers\purchaseRequestController;
+use App\Http\Controllers\PurchaseRequestController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -36,7 +36,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/stock-out', [StockOutController::class, 'create'])->name('stock-out.create');
     Route::post('/stock-out', [StockOutController::class, 'store'])->name('stock-out.store');
     Route::get('/low-stock-alert', [LowStockAlertController::class, 'index'])->name('low-stock-alert');
-    Route::get('/purchase-request', [purchaseRequestController::class, 'index'])->name('purchase-request');
+    // Purchase Requests Listing
+    Route::get('/purchase-requests', [PurchaseRequestController::class, 'index'])->name('purchase-request');
+    // Purchase Request Details
+    Route::get('/purchase-request/{id}', [PurchaseRequestController::class, 'show'])->name('purchase-request.show');
+    // Submit a new purchase request
+    Route::post('/purchase-requests', [PurchaseRequestController::class, 'store'])->name('purchase-request.store');
 });
 
 Route::get('/ingredients/{id}', [IngredientController::class, 'show'])->name('ingredients.show');
