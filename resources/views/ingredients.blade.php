@@ -62,6 +62,42 @@
             border-bottom: 1px solid #f1f5f9;
             font-size: 0.875rem;
         }
+
+        .ingredient-search-box {
+            position: relative;
+            width: 220px;
+        }
+
+        .ingredient-search-box i {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .ingredient-search-box input {
+            width: 100%;
+            height: 36px;
+            padding: 0 12px 0 34px;
+            border: 1px solid #d9e2ec;
+            border-radius: 8px;
+            background-color: #fff;
+            color: #334155;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .ingredient-search-box input::placeholder {
+            color: #64748b;
+            opacity: 1;
+        }
+
+        .ingredient-search-box input:focus {
+            border-color: #a8bfd8;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.08);
+        }
     </style>
 </head>
 <body>
@@ -78,9 +114,14 @@
                 Workspace / <span class="text-dark fw-medium">Ingredients & Supplies</span>
             </div>
             <div class="d-flex align-items-center gap-3">
-                <div class="position-relative" style="width: 260px;">
-                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary"></i>
-                    <input type="text" class="form-control form-control-sm ps-5 bg-white border-0 shadow-sm" placeholder="Search anything...">
+                <div class="ingredient-search-box">
+                    <i class="bi bi-search"></i>
+                    <input
+                        type="text"
+                        id="ingredientSearch"
+                        placeholder="Search by name or keyword"
+                        autocomplete="off"
+                    >
                 </div>
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 0.85rem;">
@@ -101,8 +142,42 @@
                 <p class="text-secondary mb-0" style="font-size: 0.9rem;">View, search, and maintain the restaurant's ingredient inventory.</p>
             </div>
             <div class="d-flex gap-2">
-                <button class="btn btn-outline-secondary bg-white shadow-sm px-3 fw-medium" style="font-size: 0.875rem;">Export</button>
-                <button class="btn btn-green shadow-sm px-3" data-bs-toggle="modal" data-bs-target="#addIngredientModal">+ Add new</button>
+                <div class="dropdown">
+                    <button type="button"
+                            class="btn btn-outline-secondary bg-white shadow-sm px-3 fw-medium dropdown-toggle"
+                            style="font-size: 0.875rem;"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+
+                        <i class="bi bi-download me-1"></i>
+                        Export
+
+                    </button>
+
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+
+                        <li>
+                            <a class="dropdown-item"
+                            href="{{ route('ingredients.export-csv', request()->query()) }}">
+
+                                <i class="bi bi-file-earmark-spreadsheet me-2 text-success"></i>
+                                Export as CSV
+
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item"
+                            href="javascript:void(0);"
+                            onclick="exportIngredientsPDF()">
+                                <i class="bi bi-file-earmark-pdf me-2 text-danger"></i>
+                                Export as PDF
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="btn btn-green shadow-sm px-3" data-bs-toggle="modal" data-bs-target="#addIngredientModal">+ Add ingredient</button>
             </div>
         </div>
 
@@ -141,7 +216,7 @@
         <!-- Data Table Card -->
         <div class="card border-0 shadow-sm rounded-4 p-4">
             <div class="table-responsive">
-                <table class="table table-custom align-middle mb-0">
+                <table id="ingredientsTable" class="table table-custom align-middle mb-0">
                     <thead>
                         <tr>
                             <th>INGREDIENT</th>
@@ -154,7 +229,7 @@
                     </thead>
                     <tbody>
                         @forelse($ingredients as $item)
-                            <tr>
+                            <tr class="ingredient-row">
                                 <td class="fw-semibold">
                                     <a href="{{ route('ingredients.show', $item->id) }}"
                                     class="text-dark text-decoration-none">
@@ -174,7 +249,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr>
+                        <tr class="empty-table-row">
                                 <td colspan="6" class="text-center text-secondary py-5">No ingredients found. Click "+ Add new" to add one!</td>
                             </tr>
                         @endforelse
@@ -195,125 +270,225 @@
     </main>
 </div>
 
-<!-- Add Ingredient Modal -->
-<div class="modal fade" id="addIngredientModal" tabindex="-1" aria-labelledby="addIngredientModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content border-0 shadow rounded-4 p-3">
-            <form action="{{ route('ingredients.store') }}" method="POST">
-                @csrf
-                <div class="modal-header border-bottom-0 pb-0">
-                    <div>
-                        <h5 class="modal-title fw-bold text-dark mb-1" id="addIngredientModalLabel">Add New Ingredient</h5>
-                        <p class="text-secondary mb-0" style="font-size: 0.8rem;">Register an ingredient or supply in the inventory.</p>
-                    </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                
-                <div class="modal-body py-3" style="font-size: 0.875rem;">
-                    <div class="mb-2">
-                        <label class="form-label fw-medium text-dark mb-1">Ingredient Name *</label>
-                        <input type="text" name="name" class="form-control bg-light border-0" required>
-                    </div>
-
-                    <div class="mb-2">
-                        <label class="form-label fw-medium text-dark mb-1">Category *</label>
-                        <select name="category" class="form-select bg-light border-0 text-secondary" required>
-                            <option value="" disabled selected></option>
-                            <option value="Meat & poultry">Meat & poultry</option>
-                            <option value="Oils & condiments">Oils & condiments</option>
-                            <option value="Dairy">Dairy</option>
-                            <option value="Canned goods">Canned goods</option>
-                            <option value="Produce">Produce</option>
-                            <option value="Dry goods">Dry goods</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-2">
-                        <label class="form-label fw-medium text-dark d-block mb-1">Unit of Measurement *</label>
-                        <div class="row g-2">
-                            <div class="col-md-4">
-                                <div class="form-check p-2 bg-light rounded-3">
-                                    <input class="form-check-input ms-1" type="radio" name="unit" id="ing_unit1" value="Pieces (pcs)" checked>
-                                    <label class="form-check-label ms-2 text-dark" for="ing_unit1" style="font-size: 0.8rem;">Pieces (pcs)</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check p-2 bg-light rounded-3">
-                                    <input class="form-check-input ms-1" type="radio" name="unit" id="ing_unit2" value="Kilograms (kg)">
-                                    <label class="form-check-label ms-2 text-dark" for="ing_unit2" style="font-size: 0.8rem;">Kilograms (kg)</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check p-2 bg-light rounded-3">
-                                    <input class="form-check-input ms-1" type="radio" name="unit" id="ing_unit3" value="Grams (g)">
-                                    <label class="form-check-label ms-2 text-dark" for="ing_unit3" style="font-size: 0.8rem;">Grams (g)</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check p-2 bg-light rounded-3">
-                                    <input class="form-check-input ms-1" type="radio" name="unit" id="ing_unit4" value="Liters (L)">
-                                    <label class="form-check-label ms-2 text-dark" for="ing_unit4" style="font-size: 0.8rem;">Liters (L)</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check p-2 bg-light rounded-3">
-                                    <input class="form-check-input ms-1" type="radio" name="unit" id="ing_unit5" value="Milliliters (mL)">
-                                    <label class="form-check-label ms-2 text-dark" for="ing_unit5" style="font-size: 0.8rem;">Milliliters (mL)</label>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-check p-2 bg-light rounded-3">
-                                    <input class="form-check-input ms-1" type="radio" name="unit" id="ing_unit6" value="Packs / Packages">
-                                    <label class="form-check-label ms-2 text-dark" for="ing_unit6" style="font-size: 0.8rem;">Packs / Packages</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row g-2 mb-2">
-                        <div class="col-md-6">
-                            <label class="form-label fw-medium text-dark mb-1">Initial Quantity *</label>
-                            <input type="number" name="quantity" class="form-control bg-light border-0" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-medium text-dark mb-1">Minimum Quantity *</label>
-                            <input type="number" name="min_quantity" class="form-control bg-light border-0" required>
-                        </div>
-                    </div>
-
-                    <div class="mb-2">
-                        <label class="form-label fw-medium text-dark mb-1">Supplier</label>
-                        <select name="supplier" class="form-select bg-light border-0 text-secondary">
-                            <option value="" selected></option>
-                            <option value="FreshFarm Co.">FreshFarm Co.</option>
-                            <option value="Golden Pantry">Golden Pantry</option>
-                            <option value="Dairy Direct">Dairy Direct</option>
-                            <option value="Roma Foods">Roma Foods</option>
-                            <option value="Green Basket">Green Basket</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-2">
-                        <label class="form-label fw-medium text-dark mb-1">Expiration Date</label>
-                        <input type="date" name="expiration_date" class="form-control bg-light border-0">
-                    </div>
-
-                    <div class="mb-1">
-                        <label class="form-label fw-medium text-dark mb-1">Notes (optional)</label>
-                        <textarea name="notes" class="form-control bg-light border-0" rows="2"></textarea>
-                    </div>
-                </div>
-
-                <div class="modal-footer border-top-0 pt-0 pb-2">
-                    <button type="button" class="btn btn-light px-3" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-green px-4">Save Ingredient</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+@include('add-ingredient-modal')
 
 <!-- Bootstrap 5 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- jsPDF Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- jsPDF AutoTable Plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+
+<script>
+        async function exportIngredientsPDF() {
+
+            try {
+                // Retrieve all matching ingredients from Laravel
+                const response = await fetch(
+                    @json(route('ingredients.export-pdf', request()->query())),
+                    {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Unable to retrieve ingredient records.');
+                }
+
+                const ingredients = await response.json();
+
+                // Check PDF libraries
+                if (!window.jspdf || !window.jspdf.jsPDF) {
+                    throw new Error('jsPDF library could not load.');
+                }
+
+                const { jsPDF } = window.jspdf;
+
+                // Create landscape A4 PDF
+                const doc = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+
+                // Report title
+                doc.setFontSize(18);
+                doc.setFont('helvetica', 'bold');
+                doc.text('StockPilot - Ingredients & Supplies', 14, 18);
+
+                // Report information
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'normal');
+                doc.text('Inventory Report', 14, 25);
+                doc.text('Generated: ' + new Date().toLocaleDateString(), 14, 31);
+                doc.text('Total Records: ' + ingredients.length, 14, 37);
+
+                // Prepare table data
+                const rows = ingredients.map(item => {
+
+                    const status = Number(item.quantity) <= Number(item.min_quantity)
+                        ? 'Low Stock'
+                        : 'In Stock';
+
+                    return [
+                        item.name ?? 'N/A',
+                        item.category ?? 'N/A',
+                        item.quantity ?? 0,
+                        item.unit ?? 'N/A',
+                        item.min_quantity ?? 0,
+                        item.supplier ?? 'N/A',
+                        status
+                    ];
+                });
+
+                // Generate table
+                doc.autoTable({
+                    startY: 44,
+
+                    head: [[
+                        'Ingredient',
+                        'Category',
+                        'Quantity',
+                        'Unit',
+                        'Minimum Stock',
+                        'Supplier',
+                        'Status'
+                    ]],
+
+                    body: rows,
+
+                    theme: 'grid',
+
+                    styles: {
+                        fontSize: 9,
+                        cellPadding: 3,
+                        valign: 'middle'
+                    },
+
+                    headStyles: {
+                        fillColor: [31, 61, 69],
+                        textColor: 255,
+                        fontStyle: 'bold'
+                    },
+
+                    alternateRowStyles: {
+                        fillColor: [245, 247, 249]
+                    },
+
+                    didParseCell: function(data) {
+
+                        if (data.section === 'body' && data.column.index === 6) {
+
+                            if (data.cell.raw === 'Low Stock') {
+                                data.cell.styles.textColor = [220, 53, 69];
+                                data.cell.styles.fontStyle = 'bold';
+                            } else {
+                                data.cell.styles.textColor = [25, 135, 84];
+                            }
+                        }
+                    }
+                });
+
+                // Add page numbers
+                const pageCount = doc.internal.getNumberOfPages();
+
+                for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(8);
+
+                    doc.text(
+                        'Page ' + i + ' of ' + pageCount,
+                        doc.internal.pageSize.getWidth() - 14,
+                        doc.internal.pageSize.getHeight() - 8,
+                        { align: 'right' }
+                    );
+                }
+
+                // Download PDF
+                doc.save(
+                    'stockpilot-ingredients-' +
+                    new Date().toISOString().slice(0, 10) +
+                    '.pdf'
+                );
+
+            } catch (error) {
+                console.error('PDF Export Error:', error);
+                alert('PDF export failed: ' + error.message);
+            }
+        }
+        </script>
+
+
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const searchInput = document.getElementById('ingredientSearch');
+            const ingredientsTable = document.getElementById('ingredientsTable');
+
+            if (!searchInput || !ingredientsTable) {
+                return;
+            }
+
+            const ingredientRows = ingredientsTable.querySelectorAll('.ingredient-row');
+            const emptyRow = ingredientsTable.querySelector('.empty-table-row');
+
+            let noResultsRow = document.getElementById('noSearchResults');
+
+            if (!noResultsRow) {
+                noResultsRow = document.createElement('tr');
+                noResultsRow.id = 'noSearchResults';
+                noResultsRow.style.display = 'none';
+
+                noResultsRow.innerHTML = `
+                    <td colspan="6" class="text-center text-secondary py-5">
+                        No matching ingredients found.
+                    </td>
+                `;
+
+                ingredientsTable.querySelector('tbody').appendChild(noResultsRow);
+            }
+
+            searchInput.addEventListener('input', function () {
+
+                const searchValue = this.value.toLowerCase().trim();
+                let visibleCount = 0;
+
+                ingredientRows.forEach(function (row) {
+
+                    const rowText = row.textContent.toLowerCase();
+                    const matches = rowText.includes(searchValue);
+
+                    row.style.display = matches ? '' : 'none';
+
+                    if (matches) {
+                        visibleCount++;
+                    }
+
+                });
+
+                if (ingredientRows.length === 0) {
+                    if (emptyRow) {
+                        emptyRow.style.display = '';
+                    }
+
+                    noResultsRow.style.display = 'none';
+                } else {
+                    if (emptyRow) {
+                        emptyRow.style.display = 'none';
+                    }
+
+                    noResultsRow.style.display =
+                        visibleCount === 0 ? '' : 'none';
+                }
+            });
+
+        });
+        </script>
 </body>
 </html>

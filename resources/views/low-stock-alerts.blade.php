@@ -285,16 +285,16 @@
             </div>
 
             <div class="d-flex align-items-center gap-3">
-                <form action="{{ route('low-stock-alert') }}" method="GET" class="search-box">
+                <div class="search-box">
                     <i class="bi bi-search"></i>
 
                     <input
                         type="text"
-                        name="search"
+                        id="lowStockSearch"
                         placeholder="Search ingredients..."
-                        value="{{ request('search') }}"
+                        autocomplete="off"
                     >
-                </form>
+                </div>
 
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 0.85rem;">
@@ -319,10 +319,38 @@
                 </div>
 
                 <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-outline-secondary bg-white text-dark border-secondary-subtle px-3 fw-medium">
-                        Export alerts
-                    </button>
-                    <button type="button" class="btn btn-green px-3">
+                    
+                    <div class="dropdown">
+                        <button type="button"
+                                class="btn btn-outline-secondary bg-white text-dark border-secondary-subtle px-3 fw-medium dropdown-toggle"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            <i class="bi bi-download me-1"></i> Export alerts
+                        </button>
+
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                            <li>
+                                <a class="dropdown-item"
+                                href="{{ route('low-stock-alert.export-csv') }}">
+                                    <i class="bi bi-file-earmark-spreadsheet me-2 text-success"></i>
+                                    Export as CSV
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item"
+                                    href="{{ route('low-stock-alert.export-pdf') }}">
+                                    <i class="bi bi-file-earmark-pdf me-2 text-danger"></i>
+                                    Export as PDF
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <button type="button"
+                            class="btn btn-green px-3"
+                            data-bs-toggle="modal"
+                            data-bs-target="#createPurchaseRequestModal">
                         <i class="bi bi-plus-lg me-1"></i> Create request
                     </button>
                 </div>
@@ -360,7 +388,7 @@
                 <h3>Items requiring attention</h3>
 
                 <div class="table-container">
-                    <table class="alerts-table">
+                    <table id="lowStockTable" class="alerts-table">
                         <thead>
                             <tr>
                                 <th>INGREDIENT</th>
@@ -373,7 +401,7 @@
                         </thead>
                         <tbody>
                             @forelse ($alerts ?? [] as $ingredient)
-                                <tr>
+                                <tr class="alert-row">
                                     <td class="ingredient-name">
                                         {{ $ingredient->name }}
                                     </td>
@@ -403,7 +431,13 @@
                                     </td>
                                     <td class="action-text">
                                         @if (in_array($ingredient->alert_status, ['Critical', 'Low Stock']))
-                                            Create request
+                                            <button type="button"
+                                                    class="btn btn-link action-text text-decoration-none p-0"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#createPurchaseRequestModal"
+                                                    data-ingredient-id="{{ $ingredient->id }}">
+                                                Create request
+                                            </button>
                                         @else
                                             <button
                                                 type="button"
@@ -427,7 +461,7 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr>
+                                <tr class="empty-table-row">
                                     <td colspan="6" class="text-center text-secondary py-4">
                                         No ingredients currently require attention.
                                     </td>
@@ -501,6 +535,107 @@
                 } else if (status === 'Expired') {
                     statusElement.classList.add('status-expired');
                 }
+            });
+        </script>
+
+        @include('purchase-requests.create-modal')
+
+        <script>
+            const purchaseRequestModal = document.getElementById('createPurchaseRequestModal');
+
+            purchaseRequestModal.addEventListener('show.bs.modal', function (event) {
+
+                const button = event.relatedTarget;
+
+                if (!button || !button.hasAttribute('data-ingredient-id')) {
+                    return;
+                }
+
+                const ingredientId = button.getAttribute('data-ingredient-id');
+
+                const ingredientSelect = purchaseRequestModal.querySelector(
+                    'select[name="items[0][ingredient_id]"]'
+                );
+
+                if (ingredientSelect) {
+
+                    ingredientSelect.value = ingredientId;
+
+                    const selectedOption = ingredientSelect.options[
+                        ingredientSelect.selectedIndex
+                    ];
+
+                    const stockDisplay = ingredientSelect
+                        .closest('.purchase-item-row')
+                        .querySelector('.current-stock');
+
+                    const stock = selectedOption.dataset.stock;
+                    const unit = selectedOption.dataset.unit || '';
+
+                    stockDisplay.textContent =
+                        'Current stock: ' + stock + ' ' + unit;
+                }
+
+            });
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+
+                const searchInput = document.getElementById('lowStockSearch');
+                const alertsTable = document.getElementById('lowStockTable');
+
+                if (!searchInput || !alertsTable) {
+                    return;
+                }
+
+                const alertRows = alertsTable.querySelectorAll('.alert-row');
+                const emptyRow = alertsTable.querySelector('.empty-table-row');
+
+                let noResultsRow = document.getElementById('noAlertSearchResults');
+
+                if (!noResultsRow) {
+                    noResultsRow = document.createElement('tr');
+                    noResultsRow.id = 'noAlertSearchResults';
+                    noResultsRow.style.display = 'none';
+
+                    noResultsRow.innerHTML = `
+                        <td colspan="6" class="text-center text-secondary py-4">
+                            No matching alerts found.
+                        </td>
+                    `;
+
+                    alertsTable.querySelector('tbody').appendChild(noResultsRow);
+                }
+
+                searchInput.addEventListener('input', function () {
+
+                    const searchValue = this.value.toLowerCase().trim();
+                    let visibleCount = 0;
+
+                    alertRows.forEach(function (row) {
+
+                        const rowText = row.textContent.toLowerCase();
+                        const matches = rowText.includes(searchValue);
+
+                        row.style.display = matches ? '' : 'none';
+
+                        if (matches) {
+                            visibleCount++;
+                        }
+
+                    });
+
+                    noResultsRow.style.display =
+                        visibleCount === 0 && alertRows.length > 0 ? '' : 'none';
+
+                    if (emptyRow) {
+                        emptyRow.style.display =
+                            alertRows.length === 0 ? '' : 'none';
+                    }
+
+                });
+
             });
         </script>
 </body>
