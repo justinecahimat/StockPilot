@@ -285,16 +285,16 @@
             </div>
 
             <div class="d-flex align-items-center gap-3">
-                <form action="{{ route('low-stock-alert') }}" method="GET" class="search-box">
+                <div class="search-box">
                     <i class="bi bi-search"></i>
 
                     <input
                         type="text"
-                        name="search"
+                        id="lowStockSearch"
                         placeholder="Search ingredients..."
-                        value="{{ request('search') }}"
+                        autocomplete="off"
                     >
-                </form>
+                </div>
 
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 0.85rem;">
@@ -319,9 +319,34 @@
                 </div>
 
                 <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-outline-secondary bg-white text-dark border-secondary-subtle px-3 fw-medium">
-                        Export alerts
-                    </button>
+                    
+                    <div class="dropdown">
+                        <button type="button"
+                                class="btn btn-outline-secondary bg-white text-dark border-secondary-subtle px-3 fw-medium dropdown-toggle"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            <i class="bi bi-download me-1"></i> Export alerts
+                        </button>
+
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                            <li>
+                                <a class="dropdown-item"
+                                href="{{ route('low-stock-alert.export-csv') }}">
+                                    <i class="bi bi-file-earmark-spreadsheet me-2 text-success"></i>
+                                    Export as CSV
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item"
+                                    href="{{ route('low-stock-alert.export-pdf') }}">
+                                    <i class="bi bi-file-earmark-pdf me-2 text-danger"></i>
+                                    Export as PDF
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
                     <button type="button"
                             class="btn btn-green px-3"
                             data-bs-toggle="modal"
@@ -363,7 +388,7 @@
                 <h3>Items requiring attention</h3>
 
                 <div class="table-container">
-                    <table class="alerts-table">
+                    <table id="lowStockTable" class="alerts-table">
                         <thead>
                             <tr>
                                 <th>INGREDIENT</th>
@@ -376,7 +401,7 @@
                         </thead>
                         <tbody>
                             @forelse ($alerts ?? [] as $ingredient)
-                                <tr>
+                                <tr class="alert-row">
                                     <td class="ingredient-name">
                                         {{ $ingredient->name }}
                                     </td>
@@ -436,7 +461,7 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr>
+                                <tr class="empty-table-row">
                                     <td colspan="6" class="text-center text-secondary py-4">
                                         No ingredients currently require attention.
                                     </td>
@@ -550,6 +575,66 @@
                     stockDisplay.textContent =
                         'Current stock: ' + stock + ' ' + unit;
                 }
+
+            });
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+
+                const searchInput = document.getElementById('lowStockSearch');
+                const alertsTable = document.getElementById('lowStockTable');
+
+                if (!searchInput || !alertsTable) {
+                    return;
+                }
+
+                const alertRows = alertsTable.querySelectorAll('.alert-row');
+                const emptyRow = alertsTable.querySelector('.empty-table-row');
+
+                let noResultsRow = document.getElementById('noAlertSearchResults');
+
+                if (!noResultsRow) {
+                    noResultsRow = document.createElement('tr');
+                    noResultsRow.id = 'noAlertSearchResults';
+                    noResultsRow.style.display = 'none';
+
+                    noResultsRow.innerHTML = `
+                        <td colspan="6" class="text-center text-secondary py-4">
+                            No matching alerts found.
+                        </td>
+                    `;
+
+                    alertsTable.querySelector('tbody').appendChild(noResultsRow);
+                }
+
+                searchInput.addEventListener('input', function () {
+
+                    const searchValue = this.value.toLowerCase().trim();
+                    let visibleCount = 0;
+
+                    alertRows.forEach(function (row) {
+
+                        const rowText = row.textContent.toLowerCase();
+                        const matches = rowText.includes(searchValue);
+
+                        row.style.display = matches ? '' : 'none';
+
+                        if (matches) {
+                            visibleCount++;
+                        }
+
+                    });
+
+                    noResultsRow.style.display =
+                        visibleCount === 0 && alertRows.length > 0 ? '' : 'none';
+
+                    if (emptyRow) {
+                        emptyRow.style.display =
+                            alertRows.length === 0 ? '' : 'none';
+                    }
+
+                });
 
             });
         </script>

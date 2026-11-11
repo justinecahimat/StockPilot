@@ -163,7 +163,9 @@
 
                 <div class="search-box">
                     <i class="bi bi-search"></i>
-                    <input type="text" placeholder="Search anything...">
+                    <input type="text"
+                        id="requestSearch"
+                        placeholder="Search requests...">
                 </div>
 
                 <div class="d-flex align-items-center gap-2">
@@ -189,31 +191,25 @@
             <!-- PAGE HEADING -->
             <div class="d-flex justify-content-between align-items-end mb-4">
 
-                <!-- PAGE HEADING -->
-                <div class="d-flex justify-content-between align-items-end mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark mb-1">Purchase Requests</h2>
 
-                    <div>
-                        <h2 class="fw-bold text-dark mb-1">Purchase Requests</h2>
-
-                        <p class="text-secondary mb-0" style="font-size: 0.9rem;">
-                            Review and manage ingredient replenishment requests.
-                        </p>
-                    </div>
-
-                    <button type="button"
-                            class="btn btn-success px-3"
-                            data-bs-toggle="modal"
-                            data-bs-target="#createPurchaseRequestModal">
-
-                        <i class="bi bi-plus-lg me-1"></i>
-                        Create Request
-
-                    </button>
-
+                    <p class="text-secondary mb-0" style="font-size: 0.9rem;">
+                        Review and manage ingredient replenishment requests.
+                    </p>
                 </div>
 
-            </div>
+                <button type="button"
+                        class="btn btn-success px-3"
+                        data-bs-toggle="modal"
+                        data-bs-target="#createPurchaseRequestModal">
 
+                    <i class="bi bi-plus-lg me-1"></i>
+                    Create Request
+
+                </button>
+
+            </div>
 
             <!-- REQUEST TABLE -->
             <div class="request-card shadow-sm">
@@ -237,8 +233,7 @@
 
                 <div class="table-responsive">
 
-                    <table class="table table-requests align-middle mb-0">
-
+                    <table id="requestsTable" class="table table-requests align-middle mb-0">
                         <thead>
                             <tr>
                                 <th>REQUEST ID</th>
@@ -335,6 +330,35 @@
 @include('purchase-requests.create-modal')
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Get the search input and purchase requests table
+    const requestSearch = document.getElementById('requestSearch');
+    const requestsTable = document.getElementById('requestsTable');
+
+    // Listen for typing in the search bar
+    requestSearch.addEventListener('input', function () {
+
+        const searchValue = this.value.toLowerCase().trim();
+
+        // Get all table rows except the header
+        const rows = requestsTable.querySelectorAll('tbody tr');
+
+        rows.forEach(function (row) {
+
+            const rowText = row.textContent.toLowerCase();
+
+            // Show the row if it matches the search
+            if (rowText.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+
+        });
+
+    });
+</script>
 
 </body>
 </html>

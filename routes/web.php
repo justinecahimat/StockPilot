@@ -27,6 +27,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/ingredients', [IngredientController::class, 'index'])->name('ingredients.index');
     Route::post('/ingredients', [IngredientController::class, 'store'])->name('ingredients.store');
+    // Export Ingredients
+    Route::get('/ingredients/export-csv', [IngredientController::class, 'exportCsv'])->name('ingredients.export-csv');
+    Route::get('/ingredients/export-pdf', [IngredientController::class, 'exportPdf'])->name('ingredients.export-pdf');
     Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
     Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
     Route::get('/suppliers', [SupplierController::class, 'index'])->name('suppliers.index');
@@ -36,6 +39,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/stock-out', [StockOutController::class, 'create'])->name('stock-out.create');
     Route::post('/stock-out', [StockOutController::class, 'store'])->name('stock-out.store');
     Route::get('/low-stock-alert', [LowStockAlertController::class, 'index'])->name('low-stock-alert');
+    Route::get('/low-stock-alert/export-csv', [LowStockAlertController::class, 'exportCsv'])->name('low-stock-alert.export-csv');
+    Route::get('/low-stock-alert/export-pdf', [LowStockAlertController::class, 'exportPdf'])->name('low-stock-alert.export-pdf');
     // Purchase Requests Listing
     Route::get('/purchase-requests', [PurchaseRequestController::class, 'index'])->name('purchase-request');
     // Purchase Request Details

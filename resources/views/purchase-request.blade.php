@@ -153,7 +153,9 @@
             <div class="d-flex align-items-center gap-3">
                 <div class="search-box">
                     <i class="bi bi-search"></i>
-                    <input type="text" placeholder="Search anything...">
+                    <input type="text"
+                        id="ingredientSearch"
+                        placeholder="Search ingredients...">
                 </div>
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 0.85rem;">
@@ -175,8 +177,13 @@
                         <p class="text-secondary mb-0" style="font-size: 0.9rem;">Review requested items, quantities, estimated costs, and approval actions.</p>
                     </div>
                     <div class="d-flex gap-2">
-                        <a href="#" class="btn btn-outline-secondary bg-white text-dark border-secondary-subtle px-3 fw-medium">Back to requests</a>
-                        
+                        <a href="{{ route('purchase-request') }}"
+                        class="btn btn-outline-secondary bg-white text-dark border-secondary-subtle px-3 fw-medium">
+
+                            <i class="bi bi-arrow-left me-1"></i>
+                            Back to requests
+
+                        </a>
                         <!-- Action Form / Button for Approval -->
                         <form action="#" method="POST">
                             @csrf
@@ -262,7 +269,7 @@
                     <h5 class="fw-bold text-dark mb-4">Requested items</h5>
 
                     <div class="table-responsive">
-                        <table class="table table-items align-middle mb-0">
+                        <table id="ingredientsTable" class="table table-requests align-middle mb-0">
 
                             <thead>
                                 <tr>
@@ -338,5 +345,35 @@
 
 <!-- Bootstrap 5 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+    // Get the search input and ingredients table
+    const ingredientSearch = document.getElementById('ingredientSearch');
+    const ingredientsTable = document.getElementById('ingredientsTable');
+
+    // Listen for typing in the search bar
+    ingredientSearch.addEventListener('input', function () {
+
+        const searchValue = this.value.toLowerCase().trim();
+
+        // Get all rows inside the table body
+        const rows = ingredientsTable.querySelectorAll('tbody tr');
+
+        rows.forEach(function (row) {
+
+            const rowText = row.textContent.toLowerCase();
+
+            // Show matching rows and hide non-matching rows
+            if (rowText.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+
+        });
+
+    });
+</script>
+
 </body>
 </html>

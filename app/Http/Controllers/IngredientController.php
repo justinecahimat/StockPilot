@@ -53,4 +53,92 @@ class IngredientController extends Controller
         // Display the ingredient details page
         return view('showIngredientsDetail', compact('ingredient'));
     }
+
+
+    public function exportCsv(Request $request)
+    {
+        $query = Ingredient::query();
+
+        // Apply the same search filter
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // Apply the same category filter
+        if ($request->filled('category') && $request->category !== 'All categories') {
+            $query->where('category', $request->category);
+        }
+
+        // Retrieve all matching ingredients
+        $ingredients = $query->get();
+
+        // Generate CSV download
+        return response()->streamDownload(function () use ($ingredients) {
+
+            $file = fopen('php://output', 'w');
+
+            // Add UTF-8 BOM for Excel compatibility
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            // CSV column headings
+            fputcsv($file, [
+                'Ingredient',
+                'Category',
+                'Quantity',
+                'Unit',
+                'Minimum Stock',
+                'Supplier',
+                'Status'
+            ]);
+
+            // Add ingredient records
+            foreach ($ingredients as $item) {
+
+                $status = $item->quantity <= $item->min_quantity
+                    ? 'Low Stock'
+                    : 'In Stock';
+
+                fputcsv($file, [
+                    $item->name,
+                    $item->category ?? 'N/A',
+                    $item->quantity,
+                    $item->unit,
+                    $item->min_quantity,
+                    $item->supplier ?? 'N/A',
+                    $status
+                ]);
+            }
+
+            fclose($file);
+
+        }, 'stockpilot-ingredients-' . now()->format('Y-m-d') . '.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+
+    
+    public function exportPdf(Request $request)
+    {
+        $query = Ingredient::query();
+
+        // Apply search filter
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // Apply category filter
+        if ($request->filled('category') && $request->category !== 'All categories') {
+            $query->where('category', $request->category);
+        }
+
+        // Retrieve ALL matching ingredients
+        $ingredients = $query->get();
+
+        // Return ingredient records as JSON
+        return response()->json($ingredients);
+    }
+
+
+
 }

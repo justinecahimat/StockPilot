@@ -94,4 +94,130 @@ class LowStockAlertController extends Controller
             'ingredients'
         ));
     }
+
+
+    public function exportCsv()
+    {
+        $today = Carbon::today();
+        $sevenDaysLater = Carbon::today()->addDays(7);
+
+        $alerts = Ingredient::where(function ($query) use ($today, $sevenDaysLater) {
+
+            $query->where(function ($stockQuery) {
+                $stockQuery->where('min_quantity', '>', 0)
+                    ->whereRaw('quantity < min_quantity');
+            })
+
+            ->orWhere(function ($expiryQuery) use ($today, $sevenDaysLater) {
+                $expiryQuery->whereNotNull('expiration_date')
+                    ->whereDate('expiration_date', '<=', $sevenDaysLater);
+            });
+
+        })->get();
+
+        $alerts = $alerts->map(function ($ingredient) use ($today, $sevenDaysLater) {
+
+            if ($ingredient->expiration_date && $ingredient->expiration_date < $today->toDateString()) {
+                $ingredient->alert_status = 'Expired';
+            } elseif (
+                $ingredient->expiration_date &&
+                $ingredient->expiration_date <= $sevenDaysLater->toDateString()
+            ) {
+                $ingredient->alert_status = 'Expiring Soon';
+            } elseif (
+                $ingredient->min_quantity > 0 &&
+                $ingredient->quantity < $ingredient->min_quantity * 0.25
+            ) {
+                $ingredient->alert_status = 'Critical';
+            } else {
+                $ingredient->alert_status = 'Low Stock';
+            }
+
+            return $ingredient;
+        });
+
+        $filename = 'stockpilot-alerts-' . now()->format('Y-m-d') . '.csv';
+
+        return response()->streamDownload(function () use ($alerts) {
+
+            $file = fopen('php://output', 'w');
+
+            // Add UTF-8 BOM for Excel compatibility
+            fwrite($file, "\xEF\xBB\xBF");
+
+            fputcsv($file, [
+                'Ingredient Name',
+                'Quantity',
+                'Minimum Quantity',
+                'Unit',
+                'Expiration Date',
+                'Alert Status'
+            ]);
+
+            foreach ($alerts as $ingredient) {
+                fputcsv($file, [
+                    $ingredient->name,
+                    $ingredient->quantity,
+                    $ingredient->min_quantity,
+                    $ingredient->unit,
+                    $ingredient->expiration_date,
+                    $ingredient->alert_status
+                ]);
+            }
+
+            fclose($file);
+
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+
+    public function exportPdf()
+    {
+        $today = Carbon::today();
+        $sevenDaysLater = Carbon::today()->addDays(7);
+
+        $alerts = Ingredient::where(function ($query) use ($today, $sevenDaysLater) {
+
+            $query->where(function ($stockQuery) {
+                $stockQuery->where('min_quantity', '>', 0)
+                    ->whereRaw('quantity < min_quantity');
+            })
+
+            ->orWhere(function ($expiryQuery) use ($sevenDaysLater) {
+                $expiryQuery->whereNotNull('expiration_date')
+                    ->whereDate('expiration_date', '<=', $sevenDaysLater);
+            });
+
+        })->get();
+
+        $alerts = $alerts->map(function ($ingredient) use ($today, $sevenDaysLater) {
+
+            if ($ingredient->expiration_date && $ingredient->expiration_date < $today->toDateString()) {
+                $ingredient->alert_status = 'Expired';
+            } elseif (
+                $ingredient->expiration_date &&
+                $ingredient->expiration_date <= $sevenDaysLater->toDateString()
+            ) {
+                $ingredient->alert_status = 'Expiring Soon';
+            } elseif (
+                $ingredient->min_quantity > 0 &&
+                $ingredient->quantity < $ingredient->min_quantity * 0.25
+            ) {
+                $ingredient->alert_status = 'Critical';
+            } else {
+                $ingredient->alert_status = 'Low Stock';
+            }
+
+            return $ingredient;
+        });
+
+        return view('exports.low-stock-alerts-pdf', compact(
+            'alerts',
+            'today'
+        ));
+    }
+
+
 }

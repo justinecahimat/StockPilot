@@ -159,7 +159,11 @@
                 <p class="text-secondary mb-0" style="font-size: 0.9rem;">A clear overview of ingredient stock, alerts, and pending purchase requests.</p>
             </div>
             <div>
-                <button class="btn btn-green shadow-sm px-3" data-bs-toggle="modal" data-bs-target="#addIngredientModal">+ Add ingredient</button>
+                <button class="btn btn-green shadow-sm px-3"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addIngredientModal">
+                    + Add ingredient
+                </button>
             </div>
         </div>
 
@@ -276,6 +280,8 @@
         </div>
     </main>
 </div>
+
+@include('add-ingredient-modal')
 
 <!-- Bootstrap 5 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
