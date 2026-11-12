@@ -10,11 +10,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('purchase_requests', function (Blueprint $table) {
-            $table->string('reference_no', 50)->unique();
-
-            $table->foreignId('requested_by')
-                  ->constrained('users')
-                  ->restrictOnDelete();
+         // $table->string('reference_no', 50)->unique();
+ 
+         // $table->foreignId('requested_by')
+         //         ->constrained('users')
+         //         ->restrictOnDelete();
+         
         });
     }
 

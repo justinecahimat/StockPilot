@@ -142,15 +142,18 @@
             <i class="bi bi-file-earmark-text"></i> Purchase Requests
         </a>
 
-        <a href="#" class="nav-link">
+        <a href="{{ route('inventory.history') }}" 
+            class="nav-link {{ request()->routeIs('inventory.history*') ? 'active' : '' }}">
             <i class="bi bi-clock-history"></i> Inventory History
         </a>
 
-        <a href="#" class="nav-link">
+        <a href="{{ route('reports.index') }}" 
+            class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">
             <i class="bi bi-bar-chart"></i> Reports
         </a>
 
-        <a href="#" class="nav-link">
+        <a href="{{ route('users.index') }}" 
+            class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
             <i class="bi bi-people"></i> User Management
         </a>
 

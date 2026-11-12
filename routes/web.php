@@ -11,6 +11,9 @@ use App\Http\Controllers\StockInController;
 use App\Http\Controllers\StockOutController;
 use App\Http\Controllers\LowStockAlertController;
 use App\Http\Controllers\PurchaseRequestController;
+use App\Http\Controllers\InventoryHistoryController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -47,6 +50,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/purchase-request/{id}', [PurchaseRequestController::class, 'show'])->name('purchase-request.show');
     // Submit a new purchase request
     Route::post('/purchase-requests', [PurchaseRequestController::class, 'store'])->name('purchase-request.store');
+    
+    // Inventory History Route
+    Route::get('/inventory-history', [InventoryHistoryController::class, 'index'])->name('inventory.history');
+
+    // Reports Route
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+
+    // User Management Routes
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
 });
 
 Route::get('/ingredients/{id}', [IngredientController::class, 'show'])->name('ingredients.show');
