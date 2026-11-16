@@ -102,27 +102,28 @@
                         <span class="text-muted small mt-1">Awaiting review</span>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card p-3 bg-white h-100">
-                        <span class="text-muted small fw-bold">WASTE / EXPIRED</span>
-                        <h3 class="fw-bold text-dark mt-2">₱ 0.00</h3>
-                        <span class="text-muted small mt-1">Recorded losses</span>
-                    </div>
+            <div class="col-md-3">
+                <div class="card p-3 bg-white h-100">
+                    <span class="text-muted small fw-bold">WASTE / EXPIRED</span>
+                    <h3 class="fw-bold text-dark mt-2">
+                        ₱ {{ number_format($wasteExpiredValue ?? 0, 2) }}
+                    </h3>
+                    <span class="text-muted small mt-1">Recorded losses</span>
                 </div>
+            </div>
             </div>
 
             <!-- Charts & Category Section -->
             <div class="row g-4">
-                <!-- Stock Movement Chart Mock / Empty State -->
+                
+                <!-- Stock Movement Chart -->
                 <div class="col-lg-8">
                     <div class="card p-4 bg-white h-100">
                         <h5 class="fw-bold text-dark">Stock movement</h5>
-                        <p class="text-muted small">Monthly incoming vs outgoing quantities</p>
-                        <div class="d-flex align-items-center justify-content-center text-muted" style="height: 220px;">
-                            <div class="text-center">
-                                <i class="bi bi-bar-chart fs-1 text-secondary opacity-50"></i>
-                                <p class="small mb-0 mt-2">No movement data recorded yet.</p>
-                            </div>
+                        <p class="text-muted small">Monthly incoming vs outgoing quantities (Last 6 months)</p>
+
+                        <div style="height: 280px; position: relative;">
+                            <canvas id="stockMovementChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -135,7 +136,7 @@
                         <div class="mb-3">
                             <div class="d-flex justify-content-between small fw-bold text-dark mb-1">
                                 <span>{{ $cat->category_name }}</span>
-                                <span>₱ {{ number_format($cat->total_value, 2) }}</span>
+                                <span>{{ number_format($cat->total_value) }} units</span>
                             </div>
                             <div class="progress" style="height: 8px; background-color: #e9ecef;">
                                 <div class="progress-bar" style="width: 100%; background-color: #107c57;"></div>
@@ -154,6 +155,67 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+    const chartLabels = @json($stockMovementLabels);
+    const stockInValues = @json($stockInData);
+    const stockOutValues = @json($stockOutData);
+
+    const ctx = document.getElementById('stockMovementChart');
+
+    new Chart(ctx, {
+        type: 'bar',
+
+        data: {
+            labels: chartLabels,
+
+            datasets: [
+                {
+                    label: 'Stock-In',
+                    data: stockInValues,
+                    backgroundColor: '#107c57',
+                    borderRadius: 5
+                },
+                {
+                    label: 'Stock-Out',
+                    data: stockOutValues,
+                    backgroundColor: '#e09b36',
+                    borderRadius: 5
+                }
+            ]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            },
+
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Quantity'
+                    }
+                },
+
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Month'
+                    }
+                }
+            }
+        }
+    });
+</script>
 </body>
 </html>

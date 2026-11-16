@@ -16,6 +16,7 @@ class Ingredient extends Model
         'unit',
         'quantity',
         'min_quantity',
+        'unit_cost',
         'supplier',
         'expiration_date',
         'notes',

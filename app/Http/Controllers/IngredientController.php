@@ -35,6 +35,7 @@ class IngredientController extends Controller
             'unit' => 'required|string|max:50',
             'quantity' => 'required|integer|min:0',
             'min_quantity' => 'required|integer|min:0',
+            'unit_cost' => 'required|numeric|min:0',
             'supplier' => 'nullable|string|max:255',
             'expiration_date' => 'nullable|date',
             'notes' => 'nullable|string|max:1000',

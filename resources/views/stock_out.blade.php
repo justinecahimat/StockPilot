@@ -124,6 +124,20 @@
                             </div>
 
                             <div class="col-md-6">
+                                <label class="form-label fw-medium text-dark" style="font-size: 0.875rem;">Unit Cost (₱) *</label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    name="unit_cost"
+                                    value="{{ old('unit_cost') }}"
+                                    class="form-control bg-light border-0 py-2"
+                                    placeholder="Enter unit cost"
+                                    required
+                                >
+                            </div>
+
+                            <div class="col-md-6">
                                 <label class="form-label fw-medium text-dark" style="font-size: 0.875rem;">Reason *</label>
                                 <select name="reason" class="form-select bg-light border-0 py-2" required>
                                     <option value="" disabled selected>Select reason</option>

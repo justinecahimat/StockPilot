@@ -18,13 +18,27 @@ class InventoryHistoryController extends Controller
                 'users.name as recorded_by'
             );
 
+        // Search by ingredient name
         if ($request->filled('search')) {
             $search = $request->input('search');
+
             $query->where('ingredients.name', 'like', "%{$search}%");
         }
 
-        $activities = $query->orderBy('inventory_activities.created_at', 'desc')->paginate(10);
+        // Filter by transaction type
+        if ($request->filled('category')) {
+            $query->where(
+                'inventory_activities.transaction_type',
+                $request->category
+            );
+        }
 
-        return view('inventory-history.index', compact('activities'));
+        // Retrieve activities, newest first
+        $histories = $query
+            ->orderBy('inventory_activities.created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('inventory-history.index', compact('histories'));
     }
 }

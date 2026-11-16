@@ -14,6 +14,7 @@ use App\Http\Controllers\PurchaseRequestController;
 use App\Http\Controllers\InventoryHistoryController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\InventoryReportController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -50,7 +51,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/purchase-request/{id}', [PurchaseRequestController::class, 'show'])->name('purchase-request.show');
     // Submit a new purchase request
     Route::post('/purchase-requests', [PurchaseRequestController::class, 'store'])->name('purchase-request.store');
-    
+    // Approve a purchase request
+    Route::patch('/purchase-request/{id}/approve', [PurchaseRequestController::class, 'approve'])->name('purchase-request.approve');
     // Inventory History Route
     Route::get('/inventory-history', [InventoryHistoryController::class, 'index'])->name('inventory.history');
 
@@ -60,7 +62,9 @@ Route::middleware(['auth'])->group(function () {
     // User Management Routes
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
-    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');    
+    // Inventory Reports
+    Route::get('/reports', [InventoryReportController::class, 'index'])->name('reports.index');
 });
 
 Route::get('/ingredients/{id}', [IngredientController::class, 'show'])->name('ingredients.show');
