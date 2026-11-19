@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -156,17 +155,11 @@
             <div class="top-nav">
                 Workspace /
                 <span class="text-dark fw-medium">Purchase Requests</span>
-                <h2 class="text-dark fw-medium mb-0">Purchase Requests</h2>
             </div>
 
             <div class="d-flex align-items-center gap-3">
 
-                <div class="search-box">
-                    <i class="bi bi-search"></i>
-                    <input type="text"
-                        id="requestSearch"
-                        placeholder="Search requests...">
-                </div>
+                @include('global-search')
 
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold"
@@ -184,7 +177,6 @@
 
             </div>
         </header>
-
 
         <div class="page-content">
 
@@ -214,7 +206,7 @@
             <!-- REQUEST TABLE -->
             <div class="request-card shadow-sm">
 
-                <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
 
                     <div>
                         <h5 class="fw-bold text-dark mb-1">All Requests</h5>
@@ -224,12 +216,21 @@
                         </p>
                     </div>
 
-                    <span class="badge bg-success-subtle text-success px-3 py-2">
-                        {{ $requests->count() }} Requests
-                    </span>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="search-box">
+                            <i class="bi bi-search"></i>
+                            <input type="text"
+                                id="requestSearch"
+                                placeholder="Search requests..."
+                                autocomplete="off">
+                        </div>
+
+                        <span class="badge bg-success-subtle text-success px-3 py-2">
+                            {{ $requests->count() }} Requests
+                        </span>
+                    </div>
 
                 </div>
-
 
                 <div class="table-responsive">
 
@@ -248,30 +249,30 @@
 
                         <tbody>
 
-                            @forelse($requests as $request)
+                            @forelse ($requests as $purchaseReq)
 
                                 @php
-                                    $total = $request->items->sum(function ($item) {
+                                    $total = $purchaseReq->items->sum(function ($item) {
                                         return $item->requested_quantity * $item->unit_cost;
                                     });
 
-                                    $status = strtolower($request->status);
+                                    $status = strtolower($purchaseReq->status);
                                 @endphp
 
                                 <tr>
 
                                     <td>
                                         <span class="request-id">
-                                            {{ $request->reference_no }}
+                                            {{ $purchaseReq->reference_no }}
                                         </span>
                                     </td>
 
                                     <td class="fw-medium">
-                                        {{ $request->requester->name ?? 'Unknown' }}
+                                        {{ $purchaseReq->requester->name ?? 'Unknown' }}
                                     </td>
 
                                     <td>
-                                        {{ $request->items->count() }} items
+                                        {{ $purchaseReq->items->count() }} items
                                     </td>
 
                                     <td class="fw-semibold text-dark">
@@ -279,21 +280,17 @@
                                     </td>
 
                                     <td>
-                                        {{ $request->created_at->format('M d, Y') }}
+                                        {{ $purchaseReq->created_at->format('M d, Y') }}
                                     </td>
 
                                     <td>
-                                        <span class="status-badge
-                                            {{ $status === 'approved' ? 'status-approved' :
-                                               ($status === 'rejected' ? 'status-rejected' : 'status-pending') }}">
-
-                                            {{ ucfirst($request->status) }}
-
+                                        <span class="status-badge {{ $status === 'approved' ? 'status-approved' : ($status === 'rejected' ? 'status-rejected' : 'status-pending') }}">
+                                            {{ ucfirst($purchaseReq->status) }}
                                         </span>
                                     </td>
 
                                     <td>
-                                        <a href="{{ route('purchase-request.show', $request->id) }}"
+                                        <a href="{{ route('purchase-request.show', $purchaseReq->id) }}"
                                            class="btn btn-view px-3 py-2">
                                             <i class="bi bi-eye me-1"></i>
                                             View
@@ -332,32 +329,20 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Get the search input and purchase requests table
     const requestSearch = document.getElementById('requestSearch');
     const requestsTable = document.getElementById('requestsTable');
 
-    // Listen for typing in the search bar
-    requestSearch.addEventListener('input', function () {
+    if (requestSearch && requestsTable) {
+        requestSearch.addEventListener('input', function () {
+            const searchValue = this.value.toLowerCase().trim();
+            const rows = requestsTable.querySelectorAll('tbody tr');
 
-        const searchValue = this.value.toLowerCase().trim();
-
-        // Get all table rows except the header
-        const rows = requestsTable.querySelectorAll('tbody tr');
-
-        rows.forEach(function (row) {
-
-            const rowText = row.textContent.toLowerCase();
-
-            // Show the row if it matches the search
-            if (rowText.includes(searchValue)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-
+            rows.forEach(function (row) {
+                const rowText = row.textContent.toLowerCase();
+                row.style.display = rowText.includes(searchValue) ? '' : 'none';
+            });
         });
-
-    });
+    }
 </script>
 
 </body>

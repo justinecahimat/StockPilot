@@ -285,16 +285,7 @@
             </div>
 
             <div class="d-flex align-items-center gap-3">
-                <div class="search-box">
-                    <i class="bi bi-search"></i>
-
-                    <input
-                        type="text"
-                        id="lowStockSearch"
-                        placeholder="Search ingredients..."
-                        autocomplete="off"
-                    >
-                </div>
+                @include('global-search')
 
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 0.85rem;">
@@ -319,7 +310,7 @@
                 </div>
 
                 <div class="d-flex gap-2">
-                    
+
                     <div class="dropdown">
                         <button type="button"
                                 class="btn btn-outline-secondary bg-white text-dark border-secondary-subtle px-3 fw-medium dropdown-toggle"
@@ -385,7 +376,18 @@
 
             <!-- ITEMS REQUIRING ATTENTION -->
             <section class="attention-section">
-                <h3>Items requiring attention</h3>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <h3 class="mb-0">Items requiring attention</h3>
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input
+                            type="text"
+                            id="lowStockSearch"
+                            placeholder="Filter alert items..."
+                            autocomplete="off"
+                        >
+                    </div>
+                </div>
 
                 <div class="table-container">
                     <table id="lowStockTable" class="alerts-table">
@@ -477,171 +479,139 @@
     </main>
 </div>
 
-        {{-- Ingredient Details Modal --}}
-        @include('ingredient-details-modal')
+{{-- Ingredient Details Modal --}}
+@include('ingredient-details-modal')
 
 <!-- Bootstrap 5 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-        <script>
-            const ingredientModal = document.getElementById('ingredientDetailsModal');
+<script>
+    const ingredientModal = document.getElementById('ingredientDetailsModal');
 
-            ingredientModal.addEventListener('show.bs.modal', function (event) {
+    if (ingredientModal) {
+        ingredientModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            if (!button) return;
 
-                // Get the button that was clicked
-                const button = event.relatedTarget;
+            const name = button.getAttribute('data-name');
+            const category = button.getAttribute('data-category');
+            const quantity = button.getAttribute('data-quantity');
+            const unit = button.getAttribute('data-unit');
+            const minimum = button.getAttribute('data-minimum');
+            const unitCost = button.getAttribute('data-unit-cost');
+            const supplier = button.getAttribute('data-supplier');
+            const expiration = button.getAttribute('data-expiration');
+            const status = button.getAttribute('data-status');
+            const notes = button.getAttribute('data-notes');
 
-                // Get ingredient information from the button
-                const name = button.getAttribute('data-name');
-                const category = button.getAttribute('data-category');
-                const quantity = button.getAttribute('data-quantity');
-                const unit = button.getAttribute('data-unit');
-                const minimum = button.getAttribute('data-minimum');
-                const unitCost = button.getAttribute('data-unit-cost');
-                const supplier = button.getAttribute('data-supplier');
-                const expiration = button.getAttribute('data-expiration');
-                const status = button.getAttribute('data-status');
-                const notes = button.getAttribute('data-notes');
+            document.getElementById('modalIngredientName').textContent = name;
+            document.getElementById('modalIngredientCategory').textContent = category || 'No category';
+            document.getElementById('modalIngredientQuantity').textContent = quantity + ' ' + unit;
+            document.getElementById('modalIngredientMinimum').textContent = minimum + ' ' + unit;
+            document.getElementById('modalIngredientUnitCost').textContent = '₱ ' + Number(unitCost || 0).toFixed(2);
+            document.getElementById('modalIngredientSupplier').textContent = supplier || 'N/A';
+            document.getElementById('modalIngredientExpiration').textContent = expiration;
+            document.getElementById('modalIngredientNotes').textContent = notes || 'No additional notes.';
 
-                // Display ingredient information
-                document.getElementById('modalIngredientName').textContent = name;
-                document.getElementById('modalIngredientCategory').textContent = category || 'No category';
+            const statusElement = document.getElementById('modalIngredientStatus');
+            statusElement.textContent = status;
+            statusElement.className = 'status';
 
-                document.getElementById('modalIngredientQuantity').textContent =
-                    quantity + ' ' + unit;
+            if (status === 'Critical') {
+                statusElement.classList.add('status-critical');
+            } else if (status === 'Low Stock') {
+                statusElement.classList.add('status-low');
+            } else if (status === 'Expiring Soon') {
+                statusElement.classList.add('status-expiring');
+            } else if (status === 'Expired') {
+                statusElement.classList.add('status-expired');
+            }
+        });
+    }
+</script>
 
-                document.getElementById('modalIngredientMinimum').textContent =
-                    minimum + ' ' + unit;
+@include('purchase-requests.create-modal')
 
-                document.getElementById('modalIngredientUnitCost').textContent =
-                    '₱ ' + Number(unitCost || 0).toFixed(2);
+<script>
+    const purchaseRequestModal = document.getElementById('createPurchaseRequestModal');
 
-                document.getElementById('modalIngredientSupplier').textContent =
-                    supplier || 'N/A';
+    if (purchaseRequestModal) {
+        purchaseRequestModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            if (!button || !button.hasAttribute('data-ingredient-id')) {
+                return;
+            }
 
-                document.getElementById('modalIngredientExpiration').textContent =
-                    expiration;
+            const ingredientId = button.getAttribute('data-ingredient-id');
+            const ingredientSelect = purchaseRequestModal.querySelector(
+                'select[name="items[0][ingredient_id]"]'
+            );
 
-                document.getElementById('modalIngredientNotes').textContent =
-                    notes || 'No additional notes.';
+            if (ingredientSelect) {
+                ingredientSelect.value = ingredientId;
+                const selectedOption = ingredientSelect.options[ingredientSelect.selectedIndex];
+                const stockDisplay = ingredientSelect
+                    .closest('.purchase-item-row')
+                    ?.querySelector('.current-stock');
 
-                // Display status with the correct color
-                const statusElement = document.getElementById('modalIngredientStatus');
-
-                statusElement.textContent = status;
-                statusElement.className = 'status';
-
-                if (status === 'Critical') {
-                    statusElement.classList.add('status-critical');
-                } else if (status === 'Low Stock') {
-                    statusElement.classList.add('status-low');
-                } else if (status === 'Expiring Soon') {
-                    statusElement.classList.add('status-expiring');
-                } else if (status === 'Expired') {
-                    statusElement.classList.add('status-expired');
-                }
-            });
-        </script>
-
-        @include('purchase-requests.create-modal')
-
-        <script>
-            const purchaseRequestModal = document.getElementById('createPurchaseRequestModal');
-
-            purchaseRequestModal.addEventListener('show.bs.modal', function (event) {
-
-                const button = event.relatedTarget;
-
-                if (!button || !button.hasAttribute('data-ingredient-id')) {
-                    return;
-                }
-
-                const ingredientId = button.getAttribute('data-ingredient-id');
-
-                const ingredientSelect = purchaseRequestModal.querySelector(
-                    'select[name="items[0][ingredient_id]"]'
-                );
-
-                if (ingredientSelect) {
-
-                    ingredientSelect.value = ingredientId;
-
-                    const selectedOption = ingredientSelect.options[
-                        ingredientSelect.selectedIndex
-                    ];
-
-                    const stockDisplay = ingredientSelect
-                        .closest('.purchase-item-row')
-                        .querySelector('.current-stock');
-
+                if (selectedOption && stockDisplay) {
                     const stock = selectedOption.dataset.stock;
                     const unit = selectedOption.dataset.unit || '';
-
-                    stockDisplay.textContent =
-                        'Current stock: ' + stock + ' ' + unit;
+                    stockDisplay.textContent = 'Current stock: ' + stock + ' ' + unit;
                 }
+            }
+        });
+    }
+</script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('lowStockSearch');
+        const alertsTable = document.getElementById('lowStockTable');
+
+        if (!searchInput || !alertsTable) {
+            return;
+        }
+
+        const alertRows = alertsTable.querySelectorAll('.alert-row');
+        const emptyRow = alertsTable.querySelector('.empty-table-row');
+
+        let noResultsRow = document.getElementById('noAlertSearchResults');
+
+        if (!noResultsRow) {
+            noResultsRow = document.createElement('tr');
+            noResultsRow.id = 'noAlertSearchResults';
+            noResultsRow.style.display = 'none';
+            noResultsRow.innerHTML = `
+                <td colspan="6" class="text-center text-secondary py-4">
+                    No matching alerts found.
+                </td>
+            `;
+            alertsTable.querySelector('tbody').appendChild(noResultsRow);
+        }
+
+        searchInput.addEventListener('input', function () {
+            const searchValue = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            alertRows.forEach(function (row) {
+                const rowText = row.textContent.toLowerCase();
+                const matches = rowText.includes(searchValue);
+                row.style.display = matches ? '' : 'none';
+                if (matches) {
+                    visibleCount++;
+                }
             });
-        </script>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
+            noResultsRow.style.display =
+                visibleCount === 0 && alertRows.length > 0 ? '' : 'none';
 
-                const searchInput = document.getElementById('lowStockSearch');
-                const alertsTable = document.getElementById('lowStockTable');
-
-                if (!searchInput || !alertsTable) {
-                    return;
-                }
-
-                const alertRows = alertsTable.querySelectorAll('.alert-row');
-                const emptyRow = alertsTable.querySelector('.empty-table-row');
-
-                let noResultsRow = document.getElementById('noAlertSearchResults');
-
-                if (!noResultsRow) {
-                    noResultsRow = document.createElement('tr');
-                    noResultsRow.id = 'noAlertSearchResults';
-                    noResultsRow.style.display = 'none';
-
-                    noResultsRow.innerHTML = `
-                        <td colspan="6" class="text-center text-secondary py-4">
-                            No matching alerts found.
-                        </td>
-                    `;
-
-                    alertsTable.querySelector('tbody').appendChild(noResultsRow);
-                }
-
-                searchInput.addEventListener('input', function () {
-
-                    const searchValue = this.value.toLowerCase().trim();
-                    let visibleCount = 0;
-
-                    alertRows.forEach(function (row) {
-
-                        const rowText = row.textContent.toLowerCase();
-                        const matches = rowText.includes(searchValue);
-
-                        row.style.display = matches ? '' : 'none';
-
-                        if (matches) {
-                            visibleCount++;
-                        }
-
-                    });
-
-                    noResultsRow.style.display =
-                        visibleCount === 0 && alertRows.length > 0 ? '' : 'none';
-
-                    if (emptyRow) {
-                        emptyRow.style.display =
-                            alertRows.length === 0 ? '' : 'none';
-                    }
-
-                });
-
-            });
-        </script>
+            if (emptyRow) {
+                emptyRow.style.display =
+                    alertRows.length === 0 ? '' : 'none';
+            }
+        });
+    });
+</script>
 </body>
 </html>

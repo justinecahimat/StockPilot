@@ -9,22 +9,24 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        
+        :root {
+            --light-bg: #f8fafc;
+            --primary-green: #16a34a;
+            --primary-green-hover: #15803d;
+            --chart-bar-light: #bbf7d0;
+        }
 
         body {
             background-color: var(--light-bg);
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         }
 
-
         .main-content {
             flex: 1;
             margin-left: 260px;
-
             height: 100vh;
             overflow-y: auto;
             overflow-x: hidden;
-
             padding: 24px 32px;
         }
 
@@ -87,13 +89,20 @@
             align-items: center;
             gap: 8px;
             flex: 1;
+            height: 100%;
+            justify-content: flex-end;
         }
 
         .chart-bar {
             width: 38px;
+            max-height: calc(100% - 28px);
             border-radius: 6px;
             background-color: var(--chart-bar-light);
-            height: 0%;
+            transition: height 0.25s ease, background-color 0.2s ease;
+        }
+
+        .chart-bar:hover {
+            background-color: var(--primary-green);
         }
 
         .chart-label {
@@ -126,7 +135,7 @@
 <body>
 
 <div class="d-flex">
-   @include('sidebar')
+    @include('sidebar')
 
     <!-- Main Content Area -->
     <main class="main-content">
@@ -136,10 +145,7 @@
                 Workspace / <span class="text-dark fw-medium">Dashboard</span>
             </div>
             <div class="d-flex align-items-center gap-3">
-                <div class="position-relative" style="width: 260px;">
-                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary"></i>
-                    <input type="text" class="form-control form-control-sm ps-5 bg-white border-0 shadow-sm" placeholder="Search anything...">
-                </div>
+                @include('global-search')
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 0.85rem;">
                         AD
@@ -205,15 +211,30 @@
                 <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
                     <h5 class="fw-bold text-dark mb-0">Inventory overview</h5>
                     <p class="text-secondary mb-3" style="font-size: 0.85rem;">Stock activity · Last 7 days</p>
-                    
+
+                    @php
+                        $bars = $overviewData ?? [
+                            ['label' => 'Mon', 'value' => 0, 'display_value' => '0', 'height' => 4],
+                            ['label' => 'Tue', 'value' => 0, 'display_value' => '0', 'height' => 4],
+                            ['label' => 'Wed', 'value' => 0, 'display_value' => '0', 'height' => 4],
+                            ['label' => 'Thu', 'value' => 0, 'display_value' => '0', 'height' => 4],
+                            ['label' => 'Fri', 'value' => 0, 'display_value' => '0', 'height' => 4],
+                            ['label' => 'Sat', 'value' => 0, 'display_value' => '0', 'height' => 4],
+                            ['label' => 'Sun', 'value' => 0, 'display_value' => '0', 'height' => 4],
+                        ];
+                    @endphp
+
                     <div class="chart-container">
-                        <div class="chart-bar-group"><div class="chart-bar"></div><span class="chart-label">Mon</span></div>
-                        <div class="chart-bar-group"><div class="chart-bar"></div><span class="chart-label">Tue</span></div>
-                        <div class="chart-bar-group"><div class="chart-bar"></div><span class="chart-label">Wed</span></div>
-                        <div class="chart-bar-group"><div class="chart-bar"></div><span class="chart-label">Thu</span></div>
-                        <div class="chart-bar-group"><div class="chart-bar"></div><span class="chart-label">Fri</span></div>
-                        <div class="chart-bar-group"><div class="chart-bar"></div><span class="chart-label">Sat</span></div>
-                        <div class="chart-bar-group"><div class="chart-bar"></div><span class="chart-label">Sun</span></div>
+                        @foreach($bars as $day)
+                            <div class="chart-bar-group">
+                                <div
+                                    class="chart-bar {{ ($day['value'] ?? 0) == 0 ? 'opacity-50' : '' }}"
+                                    style="height: {{ $day['height'] }}%;"
+                                    title="{{ $day['label'] }}: {{ $day['display_value'] ?? $day['value'] }}">
+                                </div>
+                                <span class="chart-label">{{ $day['label'] }}</span>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -222,7 +243,7 @@
                 <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
                     <h5 class="fw-bold text-dark mb-0">Low-stock watchlist</h5>
                     <p class="text-secondary mb-3" style="font-size: 0.85rem;">Items below minimum quantity</p>
-                    
+
                     @forelse($lowStockItems as $item)
                         <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
                             <div>
@@ -242,7 +263,7 @@
         <div class="card border-0 shadow-sm rounded-4 p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-bold text-dark mb-0">Recent inventory activity</h5>
-                <a href="#" class="text-success text-decoration-none fw-medium" style="font-size: 0.875rem;">View history &rarr;</a>
+                <a href="{{ route('inventory.history') }}" class="text-success text-decoration-none fw-medium" style="font-size: 0.875rem;">View history &rarr;</a>
             </div>
 
             <div class="table-responsive">

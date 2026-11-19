@@ -9,14 +9,16 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        
+        :root {
+            --light-bg: #f8fafc;
+            --primary-green: #146c43;
+            --primary-green-hover: #0f5132;
+        }
 
         body {
             background-color: var(--light-bg);
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         }
-
-        
 
         .main-content {
             flex: 1;
@@ -103,7 +105,7 @@
 <body>
 
 <div class="d-flex">
-    
+
     @include('sidebar')
 
     <!-- Main Content Area -->
@@ -114,15 +116,7 @@
                 Workspace / <span class="text-dark fw-medium">Ingredients & Supplies</span>
             </div>
             <div class="d-flex align-items-center gap-3">
-                <div class="ingredient-search-box">
-                    <i class="bi bi-search"></i>
-                    <input
-                        type="text"
-                        id="ingredientSearch"
-                        placeholder="Search by name or keyword"
-                        autocomplete="off"
-                    >
-                </div>
+                @include('global-search')
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 0.85rem;">
                         AD
@@ -215,6 +209,19 @@
 
         <!-- Data Table Card -->
         <div class="card border-0 shadow-sm rounded-4 p-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <h5 class="fw-bold text-dark mb-0">Ingredient Inventory</h5>
+                <div class="ingredient-search-box">
+                    <i class="bi bi-search"></i>
+                    <input
+                        type="text"
+                        id="ingredientSearch"
+                        placeholder="Filter visible rows..."
+                        autocomplete="off"
+                    >
+                </div>
+            </div>
+
             <div class="table-responsive">
                 <table id="ingredientsTable" class="table table-custom align-middle mb-0">
                     <thead>
@@ -249,8 +256,8 @@
                                 </td>
                             </tr>
                         @empty
-                        <tr class="empty-table-row">
-                                <td colspan="6" class="text-center text-secondary py-5">No ingredients found. Click "+ Add new" to add one!</td>
+                            <tr class="empty-table-row">
+                                <td colspan="6" class="text-center text-secondary py-5">No ingredients found. Click "+ Add ingredient" to add one!</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -281,214 +288,179 @@
 <!-- jsPDF AutoTable Plugin -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
-
 <script>
-        async function exportIngredientsPDF() {
+    async function exportIngredientsPDF() {
+        try {
+            const response = await fetch(
+                @json(route('ingredients.export-pdf', request()->query())),
+                {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                }
+            );
 
-            try {
-                // Retrieve all matching ingredients from Laravel
-                const response = await fetch(
-                    @json(route('ingredients.export-pdf', request()->query())),
-                    {
-                        headers: {
-                            'Accept': 'application/json'
+            if (!response.ok) {
+                throw new Error('Unable to retrieve ingredient records.');
+            }
+
+            const ingredients = await response.json();
+
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                throw new Error('jsPDF library could not load.');
+            }
+
+            const { jsPDF } = window.jspdf;
+
+            const doc = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'a4'
+            });
+
+            doc.setFontSize(18);
+            doc.setFont('helvetica', 'bold');
+            doc.text('StockPilot - Ingredients & Supplies', 14, 18);
+
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Inventory Report', 14, 25);
+            doc.text('Generated: ' + new Date().toLocaleDateString(), 14, 31);
+            doc.text('Total Records: ' + ingredients.length, 14, 37);
+
+            const rows = ingredients.map(item => {
+                const status = Number(item.quantity) <= Number(item.min_quantity)
+                    ? 'Low Stock'
+                    : 'In Stock';
+
+                return [
+                    item.name ?? 'N/A',
+                    item.category ?? 'N/A',
+                    item.quantity ?? 0,
+                    item.unit ?? 'N/A',
+                    item.min_quantity ?? 0,
+                    item.supplier ?? 'N/A',
+                    status
+                ];
+            });
+
+            doc.autoTable({
+                startY: 44,
+                head: [[
+                    'Ingredient',
+                    'Category',
+                    'Quantity',
+                    'Unit',
+                    'Minimum Stock',
+                    'Supplier',
+                    'Status'
+                ]],
+                body: rows,
+                theme: 'grid',
+                styles: {
+                    fontSize: 9,
+                    cellPadding: 3,
+                    valign: 'middle'
+                },
+                headStyles: {
+                    fillColor: [31, 61, 69],
+                    textColor: 255,
+                    fontStyle: 'bold'
+                },
+                alternateRowStyles: {
+                    fillColor: [245, 247, 249]
+                },
+                didParseCell: function(data) {
+                    if (data.section === 'body' && data.column.index === 6) {
+                        if (data.cell.raw === 'Low Stock') {
+                            data.cell.styles.textColor = [220, 53, 69];
+                            data.cell.styles.fontStyle = 'bold';
+                        } else {
+                            data.cell.styles.textColor = [25, 135, 84];
                         }
                     }
-                );
-
-                if (!response.ok) {
-                    throw new Error('Unable to retrieve ingredient records.');
-                }
-
-                const ingredients = await response.json();
-
-                // Check PDF libraries
-                if (!window.jspdf || !window.jspdf.jsPDF) {
-                    throw new Error('jsPDF library could not load.');
-                }
-
-                const { jsPDF } = window.jspdf;
-
-                // Create landscape A4 PDF
-                const doc = new jsPDF({
-                    orientation: 'landscape',
-                    unit: 'mm',
-                    format: 'a4'
-                });
-
-                // Report title
-                doc.setFontSize(18);
-                doc.setFont('helvetica', 'bold');
-                doc.text('StockPilot - Ingredients & Supplies', 14, 18);
-
-                // Report information
-                doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                doc.text('Inventory Report', 14, 25);
-                doc.text('Generated: ' + new Date().toLocaleDateString(), 14, 31);
-                doc.text('Total Records: ' + ingredients.length, 14, 37);
-
-                // Prepare table data
-                const rows = ingredients.map(item => {
-
-                    const status = Number(item.quantity) <= Number(item.min_quantity)
-                        ? 'Low Stock'
-                        : 'In Stock';
-
-                    return [
-                        item.name ?? 'N/A',
-                        item.category ?? 'N/A',
-                        item.quantity ?? 0,
-                        item.unit ?? 'N/A',
-                        item.min_quantity ?? 0,
-                        item.supplier ?? 'N/A',
-                        status
-                    ];
-                });
-
-                // Generate table
-                doc.autoTable({
-                    startY: 44,
-
-                    head: [[
-                        'Ingredient',
-                        'Category',
-                        'Quantity',
-                        'Unit',
-                        'Minimum Stock',
-                        'Supplier',
-                        'Status'
-                    ]],
-
-                    body: rows,
-
-                    theme: 'grid',
-
-                    styles: {
-                        fontSize: 9,
-                        cellPadding: 3,
-                        valign: 'middle'
-                    },
-
-                    headStyles: {
-                        fillColor: [31, 61, 69],
-                        textColor: 255,
-                        fontStyle: 'bold'
-                    },
-
-                    alternateRowStyles: {
-                        fillColor: [245, 247, 249]
-                    },
-
-                    didParseCell: function(data) {
-
-                        if (data.section === 'body' && data.column.index === 6) {
-
-                            if (data.cell.raw === 'Low Stock') {
-                                data.cell.styles.textColor = [220, 53, 69];
-                                data.cell.styles.fontStyle = 'bold';
-                            } else {
-                                data.cell.styles.textColor = [25, 135, 84];
-                            }
-                        }
-                    }
-                });
-
-                // Add page numbers
-                const pageCount = doc.internal.getNumberOfPages();
-
-                for (let i = 1; i <= pageCount; i++) {
-                    doc.setPage(i);
-                    doc.setFontSize(8);
-
-                    doc.text(
-                        'Page ' + i + ' of ' + pageCount,
-                        doc.internal.pageSize.getWidth() - 14,
-                        doc.internal.pageSize.getHeight() - 8,
-                        { align: 'right' }
-                    );
-                }
-
-                // Download PDF
-                doc.save(
-                    'stockpilot-ingredients-' +
-                    new Date().toISOString().slice(0, 10) +
-                    '.pdf'
-                );
-
-            } catch (error) {
-                console.error('PDF Export Error:', error);
-                alert('PDF export failed: ' + error.message);
-            }
-        }
-        </script>
-
-
-
-        <script>
-        document.addEventListener('DOMContentLoaded', function () {
-
-            const searchInput = document.getElementById('ingredientSearch');
-            const ingredientsTable = document.getElementById('ingredientsTable');
-
-            if (!searchInput || !ingredientsTable) {
-                return;
-            }
-
-            const ingredientRows = ingredientsTable.querySelectorAll('.ingredient-row');
-            const emptyRow = ingredientsTable.querySelector('.empty-table-row');
-
-            let noResultsRow = document.getElementById('noSearchResults');
-
-            if (!noResultsRow) {
-                noResultsRow = document.createElement('tr');
-                noResultsRow.id = 'noSearchResults';
-                noResultsRow.style.display = 'none';
-
-                noResultsRow.innerHTML = `
-                    <td colspan="6" class="text-center text-secondary py-5">
-                        No matching ingredients found.
-                    </td>
-                `;
-
-                ingredientsTable.querySelector('tbody').appendChild(noResultsRow);
-            }
-
-            searchInput.addEventListener('input', function () {
-
-                const searchValue = this.value.toLowerCase().trim();
-                let visibleCount = 0;
-
-                ingredientRows.forEach(function (row) {
-
-                    const rowText = row.textContent.toLowerCase();
-                    const matches = rowText.includes(searchValue);
-
-                    row.style.display = matches ? '' : 'none';
-
-                    if (matches) {
-                        visibleCount++;
-                    }
-
-                });
-
-                if (ingredientRows.length === 0) {
-                    if (emptyRow) {
-                        emptyRow.style.display = '';
-                    }
-
-                    noResultsRow.style.display = 'none';
-                } else {
-                    if (emptyRow) {
-                        emptyRow.style.display = 'none';
-                    }
-
-                    noResultsRow.style.display =
-                        visibleCount === 0 ? '' : 'none';
                 }
             });
 
+            const pageCount = doc.internal.getNumberOfPages();
+
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.text(
+                    'Page ' + i + ' of ' + pageCount,
+                    doc.internal.pageSize.getWidth() - 14,
+                    doc.internal.pageSize.getHeight() - 8,
+                    { align: 'right' }
+                );
+            }
+
+            doc.save(
+                'stockpilot-ingredients-' +
+                new Date().toISOString().slice(0, 10) +
+                '.pdf'
+            );
+
+        } catch (error) {
+            console.error('PDF Export Error:', error);
+            alert('PDF export failed: ' + error.message);
+        }
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('ingredientSearch');
+        const ingredientsTable = document.getElementById('ingredientsTable');
+
+        if (!searchInput || !ingredientsTable) {
+            return;
+        }
+
+        const ingredientRows = ingredientsTable.querySelectorAll('.ingredient-row');
+        const emptyRow = ingredientsTable.querySelector('.empty-table-row');
+
+        let noResultsRow = document.getElementById('noSearchResults');
+
+        if (!noResultsRow) {
+            noResultsRow = document.createElement('tr');
+            noResultsRow.id = 'noSearchResults';
+            noResultsRow.style.display = 'none';
+            noResultsRow.innerHTML = `
+                <td colspan="6" class="text-center text-secondary py-5">
+                    No matching ingredients found.
+                </td>
+            `;
+            ingredientsTable.querySelector('tbody').appendChild(noResultsRow);
+        }
+
+        searchInput.addEventListener('input', function () {
+            const searchValue = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            ingredientRows.forEach(function (row) {
+                const rowText = row.textContent.toLowerCase();
+                const matches = rowText.includes(searchValue);
+                row.style.display = matches ? '' : 'none';
+                if (matches) {
+                    visibleCount++;
+                }
+            });
+
+            if (ingredientRows.length === 0) {
+                if (emptyRow) {
+                    emptyRow.style.display = '';
+                }
+                noResultsRow.style.display = 'none';
+            } else {
+                if (emptyRow) {
+                    emptyRow.style.display = 'none';
+                }
+                noResultsRow.style.display =
+                    visibleCount === 0 ? '' : 'none';
+            }
         });
-        </script>
+    });
+</script>
 </body>
 </html>

@@ -9,15 +9,23 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        
+        :root {
+            --light-bg: #f8fafc;
+            --primary-green: #16a34a;
+            --primary-green-hover: #15803d;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        }
+
         .main-content {
             flex: 1;
             margin-left: 260px;
-
             height: 100vh;
             overflow-y: auto;
             overflow-x: hidden;
-
             padding: 24px 32px;
         }
 
@@ -59,9 +67,7 @@
 <body>
 
 <div class="d-flex">
-    
     @include('sidebar')
-        
 
     <!-- Main Content Area -->
     <main class="main-content">
@@ -71,10 +77,7 @@
                 Workspace / <span class="text-dark fw-medium">Categories</span>
             </div>
             <div class="d-flex align-items-center gap-3">
-                <div class="position-relative" style="width: 260px;">
-                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary"></i>
-                    <input type="text" class="form-control form-control-sm ps-5 bg-white border-0 shadow-sm" placeholder="Search anything...">
-                </div>
+                @include('global-search')
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 0.85rem;">
                         AD
@@ -94,7 +97,9 @@
                 <p class="text-secondary mb-0" style="font-size: 0.9rem;">Organize ingredients into clear, consistent inventory categories.</p>
             </div>
             <div class="d-flex gap-2">
-                <button class="btn btn-outline-secondary bg-white shadow-sm px-3 fw-medium" style="font-size: 0.875rem;">Export</button>
+                <button type="button" id="exportCategoriesBtn" class="btn btn-outline-secondary bg-white shadow-sm px-3 fw-medium" style="font-size: 0.875rem;">
+                    <i class="bi bi-download me-1"></i>Export
+                </button>
                 <button type="button" class="btn btn-green shadow-sm px-3" data-bs-toggle="modal" data-bs-target="#addCategoryModal">+ Add new</button>
             </div>
         </div>
@@ -109,15 +114,20 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <select class="form-select bg-light border-0 text-secondary">
-                        <option>All categories</option>
+                    <select name="category" class="form-select bg-light border-0 text-secondary">
+                        <option value="">All categories</option>
+                        @foreach(($allCategories ?? $categories->pluck('name')) as $filterCat)
+                            <option value="{{ $filterCat }}" {{ request('category') == $filterCat ? 'selected' : '' }}>
+                                {{ $filterCat }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <select class="form-select bg-light border-0 text-secondary">
-                        <option>All status</option>
-                        <option>Active</option>
-                        <option>Inactive</option>
+                    <select name="status" class="form-select bg-light border-0 text-secondary">
+                        <option value="">All status</option>
+                        <option value="Active" {{ request('status') == 'Active' ? 'selected' : '' }}>Active</option>
+                        <option value="Inactive" {{ request('status') == 'Inactive' ? 'selected' : '' }}>Inactive</option>
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -129,7 +139,7 @@
         <!-- Data Table Card -->
         <div class="card border-0 shadow-sm rounded-4 p-4">
             <div class="table-responsive">
-                <table class="table table-custom align-middle mb-0">
+                <table id="categoriesTable" class="table table-custom align-middle mb-0">
                     <thead>
                         <tr>
                             <th>CATEGORY NAME</th>
@@ -185,7 +195,7 @@
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                
+
                 <div class="modal-body py-3" style="font-size: 0.875rem;">
                     @if ($errors->any())
                         <div class="alert alert-danger py-2 mb-3" style="font-size: 0.8rem;">
@@ -218,5 +228,31 @@
 
 <!-- Bootstrap 5 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('exportCategoriesBtn')?.addEventListener('click', function () {
+        const table = document.getElementById('categoriesTable');
+        if (!table) return;
+
+        const rows = Array.from(table.querySelectorAll('tr'));
+        const csvLines = rows
+            .filter(row => !row.querySelector('td[colspan]'))
+            .map(row => {
+                const cells = Array.from(row.querySelectorAll('th, td'));
+                return cells
+                    .map(cell => '"' + cell.innerText.trim().replace(/"/g, '""') + '"')
+                    .join(',');
+            });
+
+        const blob = new Blob([csvLines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'categories.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    });
+</script>
 </body>
 </html>
