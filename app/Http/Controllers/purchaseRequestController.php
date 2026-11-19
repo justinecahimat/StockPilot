@@ -31,6 +31,7 @@ class PurchaseRequestController extends Controller
     {
         $request = PurchaseRequest::with([
             'requester',
+            'approver',
             'items.ingredient'
         ])->findOrFail($id);
 
@@ -96,4 +97,36 @@ class PurchaseRequestController extends Controller
             ->route('purchase-request')
             ->with('success', 'Purchase request submitted successfully.');
     }
+
+
+    // Approve a purchase request
+    public function approve(Request $request, $id)
+    {
+        // Only admins can approve purchase requests
+        if ($request->user()->role !== 'Admin') {
+            abort(403);
+        }
+
+        // Find the purchase request
+        $purchaseRequest = PurchaseRequest::findOrFail($id);
+
+        // Prevent approving an already processed request
+        if ($purchaseRequest->status !== 'pending') {
+            return redirect()
+                ->route('purchase-request.show', $id)
+                ->with('error', 'This request has already been processed.');
+        }
+
+        // Update the approval information
+        $purchaseRequest->update([
+            'status' => 'approved',
+            'approved_by' => $request->user()->id,
+            'approved_at' => now(),
+        ]);
+
+        return redirect()
+            ->route('purchase-request.show', $id)
+            ->with('success', 'Purchase request approved successfully.');
+    }
+
 }

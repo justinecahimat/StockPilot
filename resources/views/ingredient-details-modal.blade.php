@@ -45,7 +45,7 @@
                 <!-- STOCK INFORMATION -->
                 <div class="row g-0 ingredient-info-row">
 
-                    <div class="col-md-6 ingredient-info-item">
+                    <div class="col-md-4 ingredient-info-item">
                         <div class="d-flex align-items-center gap-3">
                             <i class="bi bi-box-seam info-icon"></i>
 
@@ -58,13 +58,26 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6 ingredient-info-item">
+                    <div class="col-md-4 ingredient-info-item">
                         <div class="d-flex align-items-center gap-3">
                             <i class="bi bi-exclamation-triangle info-icon warning-icon"></i>
 
                             <div>
                                 <small class="text-secondary">Minimum Stock</small>
                                 <h4 class="fw-bold mb-0" id="modalIngredientMinimum">
+                                    -
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 ingredient-info-item">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="bi bi-currency-peso info-icon"></i>
+
+                            <div>
+                                <small class="text-secondary">Unit Cost</small>
+                                <h4 class="fw-bold mb-0" id="modalIngredientUnitCost">
                                     -
                                 </h4>
                             </div>

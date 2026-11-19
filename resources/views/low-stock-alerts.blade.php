@@ -450,6 +450,7 @@
                                                 data-quantity="{{ $ingredient->quantity }}"
                                                 data-unit="{{ $ingredient->unit }}"
                                                 data-minimum="{{ $ingredient->min_quantity }}"
+                                                data-unit-cost="{{ $ingredient->unit_cost }}"
                                                 data-supplier="{{ $ingredient->supplier }}"
                                                 data-expiration="{{ $ingredient->expiration_date ? \Carbon\Carbon::parse($ingredient->expiration_date)->format('M d, Y') : 'N/A' }}"
                                                 data-status="{{ $ingredient->alert_status }}"
@@ -496,6 +497,7 @@
                 const quantity = button.getAttribute('data-quantity');
                 const unit = button.getAttribute('data-unit');
                 const minimum = button.getAttribute('data-minimum');
+                const unitCost = button.getAttribute('data-unit-cost');
                 const supplier = button.getAttribute('data-supplier');
                 const expiration = button.getAttribute('data-expiration');
                 const status = button.getAttribute('data-status');
@@ -510,6 +512,9 @@
 
                 document.getElementById('modalIngredientMinimum').textContent =
                     minimum + ' ' + unit;
+
+                document.getElementById('modalIngredientUnitCost').textContent =
+                    '₱ ' + Number(unitCost || 0).toFixed(2);
 
                 document.getElementById('modalIngredientSupplier').textContent =
                     supplier || 'N/A';

@@ -10,11 +10,12 @@ class StockOut extends Model
     use HasFactory;
 
     protected $fillable = [
-        'ingredient',
-        'quantity',
-        'reason',
-        'issued_to',
-        'date',
-        'notes',
+    'ingredient',
+    'quantity',
+    'unit_cost',
+    'reason',
+    'issued_to',
+    'date',
+    'notes',
     ];
 }

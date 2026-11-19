@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\StockIn;
 use App\Models\Ingredient;
 use App\Models\Supplier;
+use App\Models\InventoryActivity;
 
 class StockInController extends Controller
 {
@@ -49,6 +50,13 @@ class StockInController extends Controller
                 $ingredient->expiration_date = $request->expiration_date;
             }
             $ingredient->save();
+
+            InventoryActivity::create([
+                'ingredient_id' => $ingredient->id,
+                'transaction_type' => 'Stock-In',
+                'quantity' => $request->quantity,
+                'user_id' => auth()->id(),
+            ]);
         }
 
         return redirect()->route('ingredients.index')->with('success', 'Stock-In recorded successfully and inventory updated!');

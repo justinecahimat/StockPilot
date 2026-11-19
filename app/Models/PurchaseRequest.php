@@ -12,12 +12,24 @@ class PurchaseRequest extends Model
         'reference_no',
         'requested_by',
         'status',
+        'approved_by',
+        'approved_at',
+    ];
+
+    protected $casts = [
+        'approved_at' => 'datetime',
     ];
 
     // A purchase request belongs to one user
     public function requester(): BelongsTo
     {
         return $this->belongsTo(User::class, 'requested_by');
+    }
+
+    // A purchase request belongs to the admin who approved it
+    public function approver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 
     // A purchase request can contain multiple items

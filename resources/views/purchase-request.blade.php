@@ -10,7 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
 
-        /* TOP NAVBAR */
+            /* TOP NAVBAR */
         .top-navbar {
             height: 72px;
             min-height: 72px;
@@ -79,6 +79,15 @@
         .badge-pending {
             background-color: #fef3c7;
             color: #92400e;
+            font-weight: 600;
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .badge-approved {
+            background-color: #dcfce7;
+            color: #166534;
             font-weight: 600;
             font-size: 0.75rem;
             padding: 4px 10px;
@@ -185,11 +194,23 @@
 
                         </a>
                         <!-- Action Form / Button for Approval -->
-                        <form action="#" method="POST">
-                            @csrf
-                            @method('PATCH')
-                            <button type="submit" class="btn btn-green px-3">Approve request</button>
-                        </form>
+                        @if($request->status === 'pending')
+                            <form action="{{ route('purchase-request.approve', $request->id) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+
+                                <button type="submit" class="btn btn-green px-3">
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    Approve Request
+                                </button>
+                            </form>
+                        @else
+                            <button type="button" class="btn btn-secondary px-3" disabled>
+                                <i class="bi bi-check-circle me-1"></i>
+                                {{ ucfirst($request->status) }}
+                            </button>
+                        @endif
+
                     </div>
                 </div>
 
@@ -210,7 +231,7 @@
                             </h3>
 
                             <div class="mb-3">
-                                <span class="badge badge-pending">
+                                <span class="badge {{ $request->status === 'approved' ? 'badge-approved' : 'badge-pending' }}">
                                     {{ ucfirst($request->status) }}
                                 </span>
                             </div>

@@ -73,16 +73,24 @@
                         </div>
                     </div>
 
+                    
                     <div class="row g-2 mb-2">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label fw-medium text-dark mb-1">Initial Quantity *</label>
-                            <input type="number" name="quantity" class="form-control bg-light border-0" required>
+                            <input type="number" step="any" min="0" name="quantity" class="form-control bg-light border-0" required>
                         </div>
-                        <div class="col-md-6">
+
+                        <div class="col-md-4">
                             <label class="form-label fw-medium text-dark mb-1">Minimum Quantity *</label>
-                            <input type="number" name="min_quantity" class="form-control bg-light border-0" required>
+                            <input type="number" step="any" min="0" name="min_quantity" class="form-control bg-light border-0" required>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-medium text-dark mb-1">Unit Cost (₱) *</label>
+                            <input type="number" step="0.01" min="0" name="unit_cost" class="form-control bg-light border-0" placeholder="0.00" required>
                         </div>
                     </div>
+
 
                     <div class="mb-2">
                         <label class="form-label fw-medium text-dark mb-1">Supplier</label>
