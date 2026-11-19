@@ -13,13 +13,25 @@ class CategoryController extends Controller
         $query = Category::query();
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('description', 'like', '%' . $request->search . '%');
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%');
+            });
         }
 
-        $categories = $query->paginate(6);
+        if ($request->filled('category')) {
+            $query->where('name', $request->input('category'));
+        }
 
-        return view('categories', compact('categories'));
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        $categories = $query->paginate(6)->withQueryString();
+        $allCategories = Category::orderBy('name')->pluck('name');
+
+        return view('categories', compact('categories', 'allCategories'));
     }
 
     public function store(Request $request)

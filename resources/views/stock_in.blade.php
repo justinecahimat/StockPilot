@@ -9,22 +9,23 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        
+        :root {
+            --light-bg: #f8fafc;
+            --primary-green: #16a34a;
+            --primary-green-hover: #15803d;
+        }
 
         body {
             background-color: var(--light-bg);
             font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         }
 
-        
         .main-content {
             flex: 1;
             margin-left: 260px;
-
             height: 100vh;
             overflow-y: auto;
             overflow-x: hidden;
-
             padding: 24px 32px;
         }
 
@@ -48,7 +49,6 @@
 <body>
 
 <div class="d-flex">
-        
     @include('sidebar')
 
     <!-- Main Content Area -->
@@ -59,10 +59,7 @@
                 Workspace / <span class="text-dark fw-medium">Record Stock-In</span>
             </div>
             <div class="d-flex align-items-center gap-3">
-                <div class="position-relative" style="width: 260px;">
-                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary"></i>
-                    <input type="text" class="form-control form-control-sm ps-5 bg-white border-0 shadow-sm" placeholder="Search anything...">
-                </div>
+                @include('global-search')
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 0.85rem;">
                         AD

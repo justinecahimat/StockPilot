@@ -12,12 +12,20 @@ class SupplierController extends Controller
         $query = Supplier::query();
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('contact_person', 'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%');
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('contact_person', 'like', '%' . $search . '%')
+                  ->orWhere('phone', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%');
+            });
         }
 
-        $suppliers = $query->paginate(6);
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        $suppliers = $query->paginate(6)->withQueryString();
 
         return view('suppliers', compact('suppliers'));
     }
