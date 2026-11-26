@@ -98,64 +98,76 @@
 
     <div class="section-label mb-2 ps-2">WORKSPACE</div>
 
+
     <nav class="nav flex-column mb-auto">
 
         <a href="{{ route('dashboard') }}"
-           class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+        class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
             <i class="bi bi-grid-fill"></i> Dashboard
         </a>
 
         <a href="{{ route('ingredients.index') }}"
-           class="nav-link {{ request()->routeIs('ingredients.*') ? 'active' : '' }}">
+        class="nav-link {{ request()->routeIs('ingredients.*') ? 'active' : '' }}">
             <i class="bi bi-box"></i> Ingredients & Supplies
         </a>
 
         <a href="{{ route('categories.index') }}"
-           class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
+        class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
             <i class="bi bi-tags"></i> Categories
         </a>
 
         <a href="{{ route('suppliers.index') }}"
-           class="nav-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}">
+        class="nav-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}">
             <i class="bi bi-truck"></i> Suppliers
         </a>
 
         <a href="{{ route('stock-in.create') }}"
-           class="nav-link {{ request()->routeIs('stock-in.*') ? 'active' : '' }}">
+        class="nav-link {{ request()->routeIs('stock-in.*') ? 'active' : '' }}">
             <i class="bi bi-arrow-down-left-square"></i> Stock-In
         </a>
 
         <a href="{{ route('stock-out.create') }}"
-           class="nav-link {{ request()->routeIs('stock-out.*') ? 'active' : '' }}">
+        class="nav-link {{ request()->routeIs('stock-out.*') ? 'active' : '' }}">
             <i class="bi bi-arrow-up-right-square"></i> Stock-Out
         </a>
 
         <hr class="border-secondary my-2">
 
-        <a href="{{ route('low-stock-alert') }}" 
-            class="nav-link {{ request()->routeIs('low-stock-alert*') ? 'active' : '' }}">
+        <a href="{{ route('low-stock-alert') }}"
+        class="nav-link {{ request()->routeIs('low-stock-alert*') ? 'active' : '' }}">
             <i class="bi bi-exclamation-triangle"></i> Low-Stock Alerts
         </a>
 
-        <a href="{{ route('purchase-request') }}" 
-            class="nav-link {{ request()->routeIs('purchase-request*') ? 'active' : '' }}">
+        <a href="{{ route('purchase-request') }}"
+        class="nav-link {{ request()->routeIs('purchase-request*') ? 'active' : '' }}">
             <i class="bi bi-file-earmark-text"></i> Purchase Requests
         </a>
 
-        <a href="{{ route('inventory.history') }}" 
-            class="nav-link {{ request()->routeIs('inventory.history*') ? 'active' : '' }}">
+        <a href="{{ route('inventory.history') }}"
+        class="nav-link {{ request()->routeIs('inventory.history*') ? 'active' : '' }}">
             <i class="bi bi-clock-history"></i> Inventory History
         </a>
 
-        <a href="{{ route('reports.index') }}" 
-            class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">
-            <i class="bi bi-bar-chart"></i> Reports
-        </a>
+        {{-- Admin-only pages --}}
+        @if(strtolower(auth()->user()->role) === 'admin')
 
-        <a href="{{ route('users.index') }}" 
+            <hr class="border-secondary my-2">
+
+            <div class="section-label mb-2 ps-2">
+                ADMINISTRATION
+            </div>
+
+            <a href="{{ route('reports.index') }}"
+            class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">
+                <i class="bi bi-bar-chart"></i> Reports
+            </a>
+
+            <a href="{{ route('users.index') }}"
             class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
-            <i class="bi bi-people"></i> User Management
-        </a>
+                <i class="bi bi-people"></i> User Management
+            </a>
+
+        @endif
 
     </nav>
 

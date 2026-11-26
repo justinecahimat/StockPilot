@@ -54,15 +54,33 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/purchase-request/{id}', [PurchaseRequestController::class, 'show'])->name('purchase-request.show');
     Route::post('/purchase-requests', [PurchaseRequestController::class, 'store'])->name('purchase-request.store');
     Route::patch('/purchase-request/{id}/approve', [PurchaseRequestController::class, 'approve'])->name('purchase-request.approve');
+    Route::patch('/purchase-request/{id}/reject',[PurchaseRequestController::class, 'reject'])->name('purchase-request.reject');
 
     Route::get('/inventory-history', [InventoryHistoryController::class, 'index'])->name('inventory.history');
 
-    Route::get('/users', [UserController::class, 'index'])->name('users.index');
-    Route::post('/users', [UserController::class, 'store'])->name('users.store');
-    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/users', [UserController::class, 'index'])
+        ->name('users.index');
 
-    Route::get('/reports', [InventoryReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/generate', [InventoryReportController::class, 'generate'])->name('reports.generate');
+    Route::post('/users', [UserController::class, 'store'])
+        ->name('users.store');
+
+    Route::patch('/users/{id}/approve', [UserController::class, 'approve'])
+        ->name('users.approve');
+
+    Route::patch('/users/{id}/reject', [UserController::class, 'reject'])
+        ->name('users.reject');
+
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])
+        ->name('users.destroy');
+});
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/reports', [InventoryReportController::class, 'index'])
+        ->name('reports.index');
+
+    Route::get('/reports/generate', [InventoryReportController::class, 'generate'])
+        ->name('reports.generate');
+});
 });
 
 Route::get('/ingredients/{id}', [IngredientController::class, 'show'])->name('ingredients.show');

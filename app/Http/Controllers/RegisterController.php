@@ -24,15 +24,18 @@ class RegisterController extends Controller
         ]);
 
         // 2. Create the account
+
         User::create([
             'name' => $data['F_name'] . ' ' . $data['L_name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'role' => 'Staff',
+            'status' => 'pending',
         ]);
+
 
         // 3. Redirect to login after registration
         return redirect()->route('login')
-            ->with('success', 'Registration successful! You can now log in.');
+            ->with('success', 'Registration submitted! Please wait for Admin approval before logging in.');
     }
 }

@@ -28,7 +28,119 @@
             border: none;
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
         }
+
+/* REPORT METRIC CARDS */
+.report-metric-card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--metric-border) !important;
+    border-radius: 16px !important;
+    background: var(--metric-bg) !important;
+    padding: 22px !important;
+    min-height: 160px;
+    box-shadow: 0 4px 14px rgba(30, 41, 59, 0.04) !important;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.report-metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(30, 41, 59, 0.10) !important;
+}
+
+.report-metric-card::after {
+    content: "";
+    position: absolute;
+    right: -25px;
+    top: -30px;
+    width: 105px;
+    height: 105px;
+    border-radius: 50%;
+    background: var(--metric-accent);
+    opacity: 0.07;
+    pointer-events: none;
+}
+
+.metric-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.metric-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--metric-icon-bg);
+    color: var(--metric-accent);
+    font-size: 20px;
+}
+
+.report-metric-card .metric-label {
+    color: #64748b;
+    font-size: 0.76rem;
+    font-weight: 750;
+    letter-spacing: 0.45px;
+}
+
+.report-metric-card h3 {
+    color: #1e293b;
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+    margin-top: 14px !important;
+    margin-bottom: 5px;
+}
+
+.report-metric-card .metric-caption {
+    color: #64748b;
+    font-size: 0.82rem;
+}
+
+.metric-stock-in {
+    --metric-accent: #6D5CE7;
+    --metric-bg: #FBFAFF;
+    --metric-border: #E7E1FF;
+    --metric-icon-bg: #F0EDFF;
+}
+
+.metric-stock-out {
+    --metric-accent: #3984DB;
+    --metric-bg: #F8FBFF;
+    --metric-border: #DCEBFF;
+    --metric-icon-bg: #EAF3FF;
+}
+
+.metric-purchase {
+    --metric-accent: #D99132;
+    --metric-bg: #FFFCF6;
+    --metric-border: #F7E9CC;
+    --metric-icon-bg: #FFF3DB;
+}
+
+.metric-waste {
+    --metric-accent: #DC626E;
+    --metric-bg: #FFF9FA;
+    --metric-border: #F7DFE2;
+    --metric-icon-bg: #FDECEF;
+}
+
+@media (max-width: 576px) {
+    .report-metric-card {
+        min-height: 145px;
+        padding: 18px !important;
+    }
+
+    .report-metric-card h3 {
+        font-size: 1.5rem;
+    }
+}
+
     </style>
+    <link rel="stylesheet" href="{{ asset('css/stockpilot-pro.css') }}">
 </head>
 <body>
 
@@ -46,14 +158,19 @@
                 <div class="d-flex align-items-center gap-3">
                     @include('global-search')
                     <div class="d-flex align-items-center gap-2">
-                        <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 0.85rem;">
-                            AD
-                        </div>
-                        <div class="lh-1">
-                            <div class="fw-bold" style="font-size: 0.85rem;">Admin</div>
-                            <small class="text-secondary" style="font-size: 0.75rem;">Administrator</small>
-                        </div>
+                    <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold"
+                        style="width: 36px; height: 36px; font-size: 0.85rem;">
+                        {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
                     </div>
+                    <div class="lh-1">
+                        <div class="fw-bold" style="font-size: 0.85rem;">
+                            {{ auth()->user()->name }}
+                        </div>
+                        <small class="text-secondary" style="font-size: 0.75rem;">
+                            {{ ucfirst(strtolower(auth()->user()->role)) }}
+                        </small>
+                    </div>
+                </div>
                 </div>
             </div>
 
@@ -109,39 +226,88 @@
                 </div>
             </div>
 
-            <!-- Metric Cards Row -->
-            <div class="row g-4 mb-4">
-                <div class="col-md-3">
-                    <div class="card p-3 bg-white h-100">
-                        <span class="text-muted small fw-bold">STOCK-IN VALUE</span>
-                        <h3 id="stockInValueDisplay" class="fw-bold text-dark mt-2">₱ {{ number_format($stockInValue, 2) }}</h3>
-                        <span class="text-muted small mt-1 period-caption">{{ $periodLabel ?? 'Last 30 days' }}</span>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card p-3 bg-white h-100">
-                        <span class="text-muted small fw-bold">STOCK-OUT VALUE</span>
-                        <h3 id="stockOutValueDisplay" class="fw-bold text-dark mt-2">₱ {{ number_format($stockOutValue, 2) }}</h3>
-                        <span class="text-muted small mt-1 period-caption">{{ $periodLabel ?? 'Last 30 days' }}</span>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card p-3 bg-white h-100">
-                        <span class="text-muted small fw-bold">PURCHASE REQUESTS</span>
-                        <h3 id="purchaseRequestsDisplay" class="fw-bold text-dark mt-2">{{ $purchaseRequestsCount }}</h3>
-                        <span class="text-muted small mt-1">Awaiting review</span>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card p-3 bg-white h-100">
-                        <span class="text-muted small fw-bold">WASTE / EXPIRED</span>
-                        <h3 id="wasteExpiredDisplay" class="fw-bold text-dark mt-2">
-                            ₱ {{ number_format($wasteExpiredValue ?? 0, 2) }}
-                        </h3>
-                        <span class="text-muted small mt-1">Recorded losses</span>
-                    </div>
+
+<!-- Metric Cards Row -->
+<div class="row g-4 mb-4">
+
+    <!-- Stock-In -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card report-metric-card metric-stock-in h-100">
+            <div class="metric-card-top">
+                <span class="metric-label">STOCK-IN VALUE</span>
+                <div class="metric-icon">
+                    <i class="bi bi-box-arrow-in-down"></i>
                 </div>
             </div>
+
+            <h3 id="stockInValueDisplay">
+                ₱ {{ number_format($stockInValue, 2) }}
+            </h3>
+
+            <span class="metric-caption period-caption">
+                {{ $periodLabel ?? 'Last 30 days' }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Stock-Out -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card report-metric-card metric-stock-out h-100">
+            <div class="metric-card-top">
+                <span class="metric-label">STOCK-OUT VALUE</span>
+                <div class="metric-icon">
+                    <i class="bi bi-box-arrow-up"></i>
+                </div>
+            </div>
+
+            <h3 id="stockOutValueDisplay">
+                ₱ {{ number_format($stockOutValue, 2) }}
+            </h3>
+
+            <span class="metric-caption period-caption">
+                {{ $periodLabel ?? 'Last 30 days' }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Purchase Requests -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card report-metric-card metric-purchase h-100">
+            <div class="metric-card-top">
+                <span class="metric-label">PURCHASE REQUESTS</span>
+                <div class="metric-icon">
+                    <i class="bi bi-clipboard-check"></i>
+                </div>
+            </div>
+
+            <h3 id="purchaseRequestsDisplay">
+                {{ $purchaseRequestsCount }}
+            </h3>
+
+            <span class="metric-caption">Awaiting review</span>
+        </div>
+    </div>
+
+    <!-- Waste / Expired -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card report-metric-card metric-waste h-100">
+            <div class="metric-card-top">
+                <span class="metric-label">WASTE / EXPIRED</span>
+                <div class="metric-icon">
+                    <i class="bi bi-trash3"></i>
+                </div>
+            </div>
+
+            <h3 id="wasteExpiredDisplay">
+                ₱ {{ number_format($wasteExpiredValue ?? 0, 2) }}
+            </h3>
+
+            <span class="metric-caption">Recorded losses</span>
+        </div>
+    </div>
+
+</div>
+
 
             <!-- Charts & Category Section -->
             <div class="row g-4">
@@ -175,8 +341,7 @@
                                         <span>{{ number_format($cat->total_value) }} units</span>
                                     </div>
                                     <div class="progress" style="height: 8px; background-color: #e9ecef;">
-                                        <div class="progress-bar" style="width: {{ $barWidth }}%; background-color: #107c57;"></div>
-                                    </div>
+                                    <div class="progress-bar" style="width: {{ $barWidth }}%; background-color: #107c57;" role="progressbar"></div>                                    </div>
                                 </div>
                             @empty
                                 <div class="text-center py-5 text-muted">
@@ -196,8 +361,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-
-    <script>
+        <script>
         let chartLabels = @json($stockMovementLabels);
         let stockInValues = @json($stockInData);
         let stockOutValues = @json($stockOutData);

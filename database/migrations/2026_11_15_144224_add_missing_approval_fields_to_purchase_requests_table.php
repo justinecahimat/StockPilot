@@ -9,31 +9,25 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('purchase_requests', function (Blueprint $table) {
+        if (!Schema::hasColumn('purchase_requests', 'approved_by')) {
+            Schema::table('purchase_requests', function (Blueprint $table) {
+                $table->foreignId('approved_by')
+                    ->nullable()
+                    ->constrained('users')
+                    ->nullOnDelete();
+            });
+        }
 
-            // Record who approved the request
-            $table->foreignId('approved_by')
-                ->nullable()
-                ->constrained('users')
-                ->nullOnDelete();
-
-            // Record when the request was approved
-            $table->timestamp('approved_at')->nullable();
-
-        });
+        if (!Schema::hasColumn('purchase_requests', 'approved_at')) {
+            Schema::table('purchase_requests', function (Blueprint $table) {
+                $table->timestamp('approved_at')->nullable();
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('purchase_requests', function (Blueprint $table) {
-
-            $table->dropForeign(['approved_by']);
-
-            $table->dropColumn([
-                'approved_by',
-                'approved_at'
-            ]);
-
-        });
+        // This migration repairs missing fields only.
+        // Do not drop fields that may belong to another migration.
     }
 };

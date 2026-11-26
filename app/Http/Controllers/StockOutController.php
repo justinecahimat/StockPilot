@@ -51,7 +51,7 @@ class StockOutController extends Controller
                 'ingredient_id' => $ingredient->id,
                 'transaction_type' => 'Stock-Out',
                 'quantity' => $request->quantity,
-                'user_id' => auth()->id(),
+                'user_id' => $request->user()->id(),
             ]);
         }
 

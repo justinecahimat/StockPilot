@@ -101,6 +101,7 @@
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.08);
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/stockpilot-pro.css') }}">
 </head>
 <body>
 
@@ -123,7 +124,22 @@
                     </div>
                     <div class="lh-1">
                         <div class="fw-bold" style="font-size: 0.85rem;">Admin</div>
-                        <small class="text-secondary" style="font-size: 0.75rem;">Administrator</small>
+                        <small class="text-secondary" style="font-size: 0.75rem;"><div class="d-flex align-items-center gap-2">
+    <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold"
+         style="width: 36px; height: 36px; font-size: 0.85rem;">
+        {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+    </div>
+
+    <div class="lh-1">
+        <div class="fw-bold" style="font-size: 0.85rem;">
+            {{ auth()->user()->name }}
+        </div>
+
+        <small class="text-secondary" style="font-size: 0.75rem;">
+            {{ ucfirst(strtolower(auth()->user()->role)) }}
+        </small>
+    </div>
+</div></small>
                     </div>
                 </div>
             </div>

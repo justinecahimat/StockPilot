@@ -23,14 +23,38 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
+
         if (Auth::attempt(
             $credentials,
             $request->boolean('remember')
         )) {
+            $user = Auth::user();
+
+            if ($user->status === 'pending') {
+                Auth::logout();
+
+                return back()
+                    ->withErrors([
+                        'email' => 'Your account is waiting for Admin approval.',
+                    ])
+                    ->onlyInput('email');
+            }
+
+            if ($user->status !== 'approved') {
+                Auth::logout();
+
+                return back()
+                    ->withErrors([
+                        'email' => 'Your account is not active. Please contact the Admin.',
+                    ])
+                    ->onlyInput('email');
+            }
+
             $request->session()->regenerate();
 
             return redirect()->intended('/dashboard');
         }
+
 
         return back()
             ->withErrors([

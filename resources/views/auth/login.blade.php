@@ -216,9 +216,24 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/stockpilot-pro.css') }}">
 </head>
 
-<body>
+<body class="auth-login">
+    <aside class="auth-showcase">
+        <div class="auth-brand"><span class="auth-brand-mark"><i class="bi bi-box-seam"></i></span> StockPilot</div>
+        <div class="auth-hero-copy">
+            <div class="auth-eyebrow">Restaurant inventory, simplified</div>
+            <h2>Know your stock. Run your kitchen smarter.</h2>
+            <p>Keep ingredients organized, monitor stock movement, and make confident purchasing decisions from one clear workspace.</p>
+            <div class="auth-feature-list">
+                <div class="auth-feature"><i class="bi bi-graph-up-arrow"></i> Real-time inventory visibility</div>
+                <div class="auth-feature"><i class="bi bi-bell"></i> Low-stock and expiry awareness</div>
+                <div class="auth-feature"><i class="bi bi-clipboard2-check"></i> Streamlined stock requests</div>
+            </div>
+        </div>
+        <div class="auth-showcase-foot">A smarter way to manage every ingredient.</div>
+    </aside>
     <main class="login-container">
 
         <header class="brand">
