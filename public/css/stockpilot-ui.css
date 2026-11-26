@@ -1,0 +1,96 @@
+/* StockPilot visual refresh — presentation only */
+:root{
+  --sp-bg:#f5f7fb;--sp-surface:#fff;--sp-ink:#172033;--sp-muted:#718096;
+  --sp-line:#e8edf5;--sp-primary:#5267d8;--sp-primary-dark:#4054c4;
+  --sp-mint:#e8f6f1;--sp-shadow:0 10px 30px rgba(31,45,80,.055);
+  --sp-radius:18px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--sp-bg)!important;color:var(--sp-ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif!important;line-height:1.55}
+::selection{background:#dce4ff;color:#24358e}
+a{transition:color .18s ease}
+.main-content{background:var(--sp-bg);min-width:0}
+.main-content h1,.main-content h2,.main-content h3,.main-content h4,.main-content h5{color:#182238;letter-spacing:-.035em}
+.main-content .text-muted,.main-content .text-secondary{color:var(--sp-muted)!important}
+.main-content .card,.main-content .request-card,.main-content .custom-card,.main-content .chart-card,
+.main-content .bg-white.rounded,.main-content .bg-white.rounded-3{
+  border:1px solid var(--sp-line)!important;border-radius:var(--sp-radius)!important;
+  box-shadow:var(--sp-shadow);background:var(--sp-surface)
+}
+.main-content .card{overflow:hidden}
+.main-content .btn{border-radius:11px;font-weight:600;transition:all .18s ease}
+.main-content .btn-success,.main-content .btn-green,.main-content .btn-primary{
+  background:linear-gradient(135deg,#6176e8,#4c60ce)!important;border:0!important;color:#fff!important;
+  box-shadow:0 7px 16px rgba(82,103,216,.16)
+}
+.main-content .btn-success:hover,.main-content .btn-green:hover,.main-content .btn-primary:hover{
+  transform:translateY(-1px);filter:brightness(.97);box-shadow:0 10px 20px rgba(82,103,216,.22)
+}
+.main-content .btn-outline-secondary,.main-content .btn-light{border-color:#e2e8f0!important;background:#fff;color:#526078}
+.main-content .form-control,.main-content .form-select,.main-content textarea{
+  border:1px solid #e1e7f0;border-radius:11px;min-height:43px;padding:.62rem .85rem;color:#27344c
+}
+.main-content .form-control:focus,.main-content .form-select:focus,.main-content textarea:focus{
+  border-color:#8998ef;box-shadow:0 0 0 .22rem rgba(97,118,232,.12)
+}
+.main-content .table-responsive{border-radius:14px}
+.main-content .table{--bs-table-bg:transparent;margin-bottom:0}
+.main-content .table thead th,.main-content .table-custom th,.main-content .table-requests th{
+  background:#f7f9fd;color:#7b879b;font-size:.70rem;font-weight:750;letter-spacing:.075em;
+  text-transform:uppercase;border-bottom:1px solid var(--sp-line);padding:14px 16px;white-space:nowrap
+}
+.main-content .table tbody td,.main-content .table-custom td,.main-content .table-requests td{
+  padding:15px 16px;vertical-align:middle;border-bottom:1px solid #eef1f6;color:#43506a;font-size:.875rem
+}
+.main-content .table tbody tr:last-child td{border-bottom:0}
+.main-content .table tbody tr:hover{background:#f8faff}
+.main-content .badge{font-weight:650;letter-spacing:.01em;padding:.45em .72em;border-radius:999px}
+.main-content .alert{border:0;border-radius:13px}
+.main-content .modal-content{border:1px solid var(--sp-line);border-radius:20px;box-shadow:0 24px 70px rgba(20,31,60,.18);overflow:hidden}
+.main-content .modal-header,.main-content .modal-footer{border-color:var(--sp-line)}
+.main-content .modal-title{font-weight:750;letter-spacing:-.025em}
+.main-content hr{border-color:var(--sp-line);opacity:1}
+.top-nav,.breadcrumb-text{color:#8a95a8!important}
+.sidebar{
+  background:linear-gradient(180deg,#19243c 0%,#202d49 100%)!important;
+  box-shadow:8px 0 30px rgba(24,35,60,.07);border-right:1px solid rgba(255,255,255,.04)
+}
+.sidebar .brand-title{letter-spacing:-.035em}
+.sidebar .brand-subtitle{color:#9aa8c4!important;font-size:.60rem!important;letter-spacing:.11em!important}
+.sidebar .section-label{color:#8d9ab5!important;letter-spacing:.12em!important}
+.sidebar .nav-link{color:#b2bdd2!important;border-radius:11px!important;padding:10px 13px!important;margin:2px 0!important;transition:all .18s ease}
+.sidebar .nav-link i{font-size:1rem;width:19px;text-align:center}
+.sidebar .nav-link:hover{background:rgba(255,255,255,.09)!important;color:#fff!important;transform:translateX(2px)}
+.sidebar .nav-link.active{background:linear-gradient(100deg,rgba(111,132,245,.28),rgba(111,132,245,.12))!important;color:#fff!important;border-left:3px solid #aab6ff!important}
+.sidebar hr{border-color:rgba(255,255,255,.13)!important}
+.sidebar .border-top{border-color:rgba(255,255,255,.14)!important}
+.main-content .stat-icon{box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+.main-content .card-stat{border-radius:18px!important}
+.main-content .chart-bar{border-radius:8px 8px 3px 3px}
+.main-content .progress{height:8px;border-radius:99px;background:#edf1f8}
+.main-content .progress-bar{border-radius:99px}
+@media(max-width:991.98px){
+  body>.d-flex{display:flex!important;flex-direction:column!important}
+  .sidebar{position:relative!important;inset:auto!important;width:100%!important;height:auto!important;min-height:0!important;
+    max-height:none!important;overflow:visible!important;padding:14px 16px!important;z-index:5}
+  .sidebar>.mb-4{margin-bottom:12px!important}
+  .sidebar .nav{display:flex!important;flex-direction:row!important;flex-wrap:wrap;gap:4px;margin-bottom:0!important}
+  .sidebar .nav-link{width:auto;flex:1 1 145px;justify-content:flex-start;font-size:.82rem!important;padding:9px 10px!important}
+  .sidebar .section-label{margin-top:8px}
+  .sidebar hr{display:none}
+  .sidebar .mt-3{margin-top:10px!important;padding-top:8px!important}
+  .main-content{margin-left:0!important;width:100%;height:auto!important;min-height:calc(100vh - 150px);overflow:visible!important;padding:22px!important}
+  .main-content .container-fluid{padding-left:0!important;padding-right:0!important}
+}
+@media(max-width:575.98px){
+  .main-content{padding:16px!important}
+  .main-content .card,.main-content .request-card{border-radius:15px!important}
+  .main-content .table thead th,.main-content .table tbody td{padding:12px 11px;font-size:.8rem}
+  .main-content h1{font-size:1.55rem}
+  .main-content .d-flex.justify-content-between{gap:12px}
+  .main-content .btn{white-space:normal}
+  .main-content .modal-dialog{margin:.65rem}
+  .main-content .modal-content{border-radius:16px}
+  .sidebar .nav-link{flex:1 1 calc(50% - 6px)}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}

@@ -236,9 +236,24 @@
             cursor: pointer;
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/stockpilot-pro.css') }}">
 </head>
 
-<body>
+<body class="auth-register">
+    <aside class="auth-showcase">
+        <div class="auth-brand"><span class="auth-brand-mark"><i class="bi bi-box-seam"></i></span> StockPilot</div>
+        <div class="auth-hero-copy">
+            <div class="auth-eyebrow">Get started with StockPilot</div>
+            <h2>Bring clarity to your inventory.</h2>
+            <p>Create your workspace account and keep your restaurant supplies, stock movements, and purchasing activity in sync.</p>
+            <div class="auth-feature-list">
+                <div class="auth-feature"><i class="bi bi-boxes"></i> Organized ingredients and supplies</div>
+                <div class="auth-feature"><i class="bi bi-arrow-left-right"></i> Clear stock-in and stock-out records</div>
+                <div class="auth-feature"><i class="bi bi-shield-check"></i> Role-based workspace access</div>
+            </div>
+        </div>
+        <div class="auth-showcase-foot">Built for smoother day-to-day operations.</div>
+    </aside>
 
     <!-- StockPilot Header -->
     <header class="brand">

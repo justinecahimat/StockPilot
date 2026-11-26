@@ -35,7 +35,7 @@ class PurchaseRequestController extends Controller
             'items.ingredient'
         ])->findOrFail($id);
 
-        return view('purchase-request', compact('request'));
+        return view('purchase-requests.show', compact('request'));
     }
 
     // Save a new purchase request
@@ -127,6 +127,39 @@ class PurchaseRequestController extends Controller
         return redirect()
             ->route('purchase-request.show', $id)
             ->with('success', 'Purchase request approved successfully.');
+    }
+
+    public function reject(Request $request, $id)
+    {
+        // Only Admin can reject purchase requests
+        if ($request->user()->role !== 'Admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Validate the rejection reason
+        $validated = $request->validate([
+            'rejection_reason' => 'required|string|max:1000',
+        ]);
+
+        $purchaseRequest = PurchaseRequest::findOrFail($id);
+
+        // Only pending requests can be rejected
+        if ($purchaseRequest->status !== 'pending') {
+            return redirect()
+                ->route('purchase-request.show', $id)
+                ->with('error', 'Only pending purchase requests can be rejected.');
+        }
+
+        $purchaseRequest->update([
+            'status' => 'rejected',
+            'rejection_reason' => $validated['rejection_reason'],
+            'approved_by' => $request->user()->id,
+            'approved_at' => now(),
+        ]);
+
+        return redirect()
+            ->route('purchase-request.show', $id)
+            ->with('success', 'Purchase request rejected successfully.');
     }
 
 }

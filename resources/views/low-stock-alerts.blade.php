@@ -269,6 +269,7 @@
             background-color: rgba(15, 23, 42, 0.45);
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/stockpilot-pro.css') }}">
 </head>
 <body>
 
@@ -288,14 +289,19 @@
                 @include('global-search')
 
                 <div class="d-flex align-items-center gap-2">
-                    <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; font-size: 0.85rem;">
-                        AD
-                    </div>
-                    <div class="lh-1">
-                        <div class="fw-bold" style="font-size: 0.85rem;">Admin</div>
-                        <small class="text-secondary" style="font-size: 0.75rem;">Administrator</small>
-                    </div>
+                <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold"
+                    style="width: 36px; height: 36px; font-size: 0.85rem;">
+                    {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
                 </div>
+                <div class="lh-1">
+                    <div class="fw-bold" style="font-size: 0.85rem;">
+                        {{ auth()->user()->name }}
+                    </div>
+                    <small class="text-secondary" style="font-size: 0.75rem;">
+                        {{ ucfirst(strtolower(auth()->user()->role)) }}
+                    </small>
+                </div>
+            </div>
             </div>
         </header>
 

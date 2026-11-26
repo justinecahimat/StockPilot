@@ -100,7 +100,7 @@
 
         .request-id {
             font-weight: 700;
-            color: #146c43;
+            color: #6D5CE7 !important;
         }
 
         .status-badge {
@@ -127,18 +127,19 @@
         }
 
         .btn-view {
-            color: var(--primary-green);
-            border: 1px solid #cbd5e1;
-            background: #fff;
-            font-size: 0.8rem;
-            font-weight: 600;
+            color: #6D5CE7;
+            background: #F0EDFF;
+            border: 1px solid #DED8FF;
+            transition: all 0.2s ease;
         }
 
         .btn-view:hover {
-            background: #f0fdf4;
-            color: var(--primary-green-hover);
+            color: #FFFFFF;
+            background: #6D5CE7;
+            border-color: #6D5CE7;
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/stockpilot-pro.css') }}">
 </head>
 
 <body>
@@ -162,19 +163,19 @@
                 @include('global-search')
 
                 <div class="d-flex align-items-center gap-2">
-                    <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center fw-bold"
-                         style="width: 36px; height: 36px; font-size: 0.85rem;">
-                        AD
-                    </div>
-
-                    <div class="lh-1">
-                        <div class="fw-bold" style="font-size: 0.85rem;">Admin</div>
-                        <small class="text-secondary" style="font-size: 0.75rem;">
-                            Administrator
-                        </small>
-                    </div>
+                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center fw-bold"
+                    style="width: 36px; height: 36px; font-size: 0.85rem; background-color: #F0EDFF !important; color: #6D5CE7 !important;">
+                    {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
                 </div>
-
+                <div class="lh-1">
+                    <div class="fw-bold" style="font-size: 0.85rem;">
+                        {{ auth()->user()->name }}
+                    </div>
+                    <small class="text-secondary" style="font-size: 0.75rem;">
+                        {{ ucfirst(strtolower(auth()->user()->role)) }}
+                    </small>
+                </div>
+            </div>
             </div>
         </header>
 
